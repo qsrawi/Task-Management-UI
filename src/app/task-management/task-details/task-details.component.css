@@ -131,4 +131,29 @@
   .btn i {
     margin-right: 0.5rem;
   }
+
+  /* task-details.component.css */
+.quill-editor {
+  height: 150px; /* Set a smaller height for the editor */
+  margin-bottom: 20px; /* Space below the editor */
+}
+
+.ql-toolbar.ql-snow {
+  border-radius: 4px 4px 0 0; /* Rounded corners for the toolbar */
+  padding: 5px; /* Smaller padding for the toolbar */
+}
+
+.ql-container.ql-snow {
+  border-radius: 0 0 4px 4px; /* Rounded corners for the editor body */
+  border: 1px solid #ced4da; /* Lighter border for consistency */
+  font-size: 14px; /* Smaller font size for readability */
+  padding: 10px; /* Padding inside the editor */
+}
+
+.ql-editor {
+  min-height: 100px; /* Minimum height for content area */
+  font-size: 14px; /* Smaller font size for readability */
+  line-height: 1.5; /* Better line height for readability */
+}
+
   

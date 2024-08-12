@@ -7,7 +7,7 @@ import { CdkDrag, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { HeaderNavComponent } from './header-nav/header-nav.component';
 import { TaskDetailsComponent } from './task-details/task-details.component';
 import { TaskLogsComponent } from './task-logs/task-logs.component';
-
+import { QuillModule } from 'ngx-quill';
 
 @NgModule({
   declarations: [
@@ -24,6 +24,7 @@ import { TaskLogsComponent } from './task-logs/task-logs.component';
     CdkDropListGroup,
     CdkDropList,
     CdkDrag,
+    QuillModule.forRoot()
   ]
 })
 export class TaskManagementModule { }

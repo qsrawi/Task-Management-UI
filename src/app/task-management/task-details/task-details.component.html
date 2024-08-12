@@ -1,88 +1,87 @@
-<!-- Task Details Form -->
 <div class="container mt-5">
   <div class="row justify-content-center">
-      <div class="col-md-8">
-          <div class="card shadow-lg border-0">
-              <div class="card-header bg-primary text-white text-center">
-                  <h4 class="mb-0">Task Details</h4>
+    <div class="col-md-8">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center">
+          <h4 class="mb-0">Task Details</h4>
+        </div>
+        <div class="card-body p-4">
+          <form [formGroup]="taskForm">
+            <div class="mb-4">
+              <div class="mb-4 d-flex align-items-center justify-content-between">
+                <label for="title" class="form-label">Task Name</label>
+                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#logsModal">
+                  <i class="fas fa-history me-2"></i>View Logs
+                </button>
               </div>
-              <div class="card-body p-4">
-                  <form [formGroup]="taskForm">
-                      <div class="mb-4">
-                          <div class="mb-4 d-flex align-items-center justify-content-between">
-                              <label for="title" class="form-label">Task Name</label>
-                              <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#logsModal">
-                                  <i class="fas fa-history me-2"></i>View Logs
-                              </button>
-                          </div>
-                          <input type="text" id="title" class="form-control form-control-lg" formControlName="title" [readonly]="!isEditing">
-                      </div>
-                      <div class="mb-4">
-                          <label for="description" class="form-label">Description</label>
-                          <textarea id="description" class="form-control form-control-lg" formControlName="description" rows="4" [readonly]="!isEditing"></textarea>
-                      </div>
-                      <div class="mb-4">
-                          <label class="form-label">Notes</label>
-                          <div class="row">
-                              <div class="col-md-12" *ngFor="let note of notes$ | async">
-                                  <div class="card mb-3 shadow-sm">
-                                      <div class="card-body">
-                                          <p class="card-text mb-1">{{ note.note }}</p>
-                                          <small class="text-muted">
-                                              <strong>From:</strong> {{ note.userName }}<br>
-                                              <strong>Created At:</strong> {{ note.createdAt | date: 'short' }}
-                                          </small>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div class="d-flex justify-content-end mt-4">
-                          <button *ngIf="!isEditing" type="button" class="btn btn-primary btn-lg me-3 px-4" (click)="onEdit()">
-                              <i class="fas fa-edit me-2"></i>Edit
-                          </button>
-                          <button *ngIf="isEditing" type="button" class="btn btn-success btn-lg me-3 px-4" (click)="onSave()">
-                              <i class="fas fa-save me-2"></i>Save
-                          </button>
-                          <button type="button" class="btn btn-secondary btn-lg px-4" (click)="onCancel()">
-                              <i class="fas fa-times me-2"></i>Cancel
-                          </button>
-                      </div>
-                  </form>
-
-                  <!-- Add Note Section -->
-                  <div class="mt-4">
-                      <button type="button" class="btn btn-sm btn-info" (click)="toggleAddNote()">
-                          <i class="fas fa-plus me-2"></i>Add Note
-                      </button>
-                      <div *ngIf="showAddNoteInput" class="input-group mt-3">
-                          <input type="text" class="form-control" placeholder="Enter your note..." [(ngModel)]="newNote">
-                          <button class="btn btn-sm btn-primary" (click)="addNote()">
-                              <i class="fas fa-paper-plane me-2"></i>Submit
-                          </button>
-                      </div>
+              <input type="text" id="title" class="form-control form-control-lg" formControlName="title" [readonly]="!isEditing">
+            </div>
+            <div class="mb-4">
+              <label for="description" class="form-label">Description</label>
+              <quill-editor id="description" formControlName="description" [readOnly]="!isEditing" class="quill-editor"></quill-editor>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Notes</label>
+              <div class="row">
+                <div class="col-md-12" *ngFor="let note of notes$ | async">
+                  <div class="card mb-3 shadow-sm">
+                    <div class="card-body">
+                      <p class="card-text mb-1">{{ note.note }}</p>
+                      <small class="text-muted">
+                        <strong>From:</strong> {{ note.userName }}<br>
+                        <strong>Created At:</strong> {{ note.createdAt | date: 'short' }}
+                      </small>
+                    </div>
                   </div>
-
+                </div>
               </div>
+            </div>
+            <div class="d-flex justify-content-end mt-4">
+              <button *ngIf="!isEditing" type="button" class="btn btn-primary btn-lg me-3 px-4" (click)="onEdit()">
+                <i class="fas fa-edit me-2"></i>Edit
+              </button>
+              <button *ngIf="isEditing" type="button" class="btn btn-success btn-lg me-3 px-4" (click)="onSave()">
+                <i class="fas fa-save me-2"></i>Save
+              </button>
+              <button type="button" class="btn btn-secondary btn-lg px-4" (click)="onCancel()">
+                <i class="fas fa-times me-2"></i>Cancel
+              </button>
+            </div>
+          </form>
+
+          <!-- Add Note Section -->
+          <div class="mt-4">
+            <button type="button" class="btn btn-sm btn-info" (click)="toggleAddNote()">
+              <i class="fas fa-plus me-2"></i>Add Note
+            </button>
+            <div *ngIf="showAddNoteInput" class="input-group mt-3">
+              <input type="text" class="form-control" placeholder="Enter your note..." [(ngModel)]="newNote">
+              <button class="btn btn-sm btn-primary" (click)="addNote()">
+                <i class="fas fa-paper-plane me-2"></i>Submit
+              </button>
+            </div>
           </div>
+
+        </div>
       </div>
+    </div>
   </div>
 </div>
 
 <!-- Logs Modal -->
 <div class="modal fade" id="logsModal" tabindex="-1" aria-labelledby="logsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title" id="logsModalLabel">Task Logs</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-              <app-task-logs [taskId]="task.id"></app-task-logs>
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logsModalLabel">Task Logs</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body">
+        <app-task-logs [taskId]="task.id"></app-task-logs>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
   </div>
 </div>
