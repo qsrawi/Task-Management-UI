@@ -1,0 +1,134 @@
+/* Container styling */
+.container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  
+  /* Card styling */
+  .card {
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #ffffff;
+  }
+  
+  .card-header {
+    background-color: #007bff;
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
+  .card-body {
+    padding: 2rem;
+  }
+  
+  /* Form label styling */
+  .form-label {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  /* Form control styling */
+  .form-control-lg {
+    font-size: 1.1rem;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 2px solid #ced4da;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-control-lg:focus {
+    border-color: #007bff;
+    box-shadow: none;
+  }
+  
+  /* Notes styling */
+  .card-text {
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .card-body small {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #777;
+  }
+  
+  .card.mb-3.shadow-sm {
+    border-radius: 8px;
+    border: 1px solid #e3e3e3;
+  }
+  
+  .card.mb-3.shadow-sm:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Button styling */
+  .btn {
+    border-radius: 5px;
+    padding: 0.5rem 1.5rem;
+    font-size: 1.1rem;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #005cbf;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+  
+  .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+  }
+  
+  .btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+  }
+  
+  .btn-info:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+  }
+  
+  /* Add Note Input */
+  .input-group {
+    margin-top: 1rem;
+  }
+  
+  .input-group .form-control {
+    border-radius: 5px 0 0 5px;
+    font-size: 1rem;
+  }
+  
+  .input-group .btn {
+    border-radius: 0 5px 5px 0;
+    font-size: 1rem;
+  }
+  
+  /* Font Awesome Icon Alignment */
+  .btn i {
+    margin-right: 0.5rem;
+  }
+  

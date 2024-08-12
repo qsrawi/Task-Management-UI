@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { delay, map, Observable, of, tap } from 'rxjs';
 import { TaskDto } from '../../models/task';
 import { UserService } from '../../services/user.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../../services/user.service copy';
 import { ToastrService } from 'ngx-toastr';
 
@@ -28,6 +28,7 @@ export class TaskListComponent implements OnInit {
     private userService: UserService,
     private adminService: AdminService,
     private toastr: ToastrService,
+    private router: Router,
     private route: ActivatedRoute
   ) {}
 
@@ -44,7 +45,7 @@ export class TaskListComponent implements OnInit {
   }
 
   onTaskClick(task: TaskDto): void {
-    console.log('Task clicked:', task);
+    this.router.navigate(['/user/task-details'], { state: { task } });
   }
 
   drop(event: CdkDragDrop<TaskDto[]>): void {
