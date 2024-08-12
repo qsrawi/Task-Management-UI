@@ -1,0 +1,62 @@
+/* Container should cover the full viewport and center the content */
+.container {
+    width: 100%;
+    height: 100vh;
+    background-color: #2acbaa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Style the card (login form) */
+  .card {
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .card-header {
+    background-color: #2acbaa; /* Matches the background color */
+    padding: 10px;
+  }
+  
+  .card-title {
+    margin: 0;
+    color: white; /* White text color for the header */
+    font-size: 1.5rem;
+  }
+  
+  /* Styling for input groups, making sure the elements are aligned properly */
+  .input-group-text {
+    background-color: #2acbaa;
+    color: white;
+  }
+  
+  .btn-primary {
+    background-color: #2acbaa;
+    border-color: #2acbaa;
+  }
+  
+  .btn-primary:hover {
+    background-color: #249a87;
+    border-color: #249a87;
+  }
+  
+  .text-danger {
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .signup {
+    margin-top: 20px;
+  }
+  
+  .signup a {
+    color: #2acbaa;
+    text-decoration: none;
+  }
+  
+  .signup a:hover {
+    text-decoration: underline;
+  }
+  

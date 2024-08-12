@@ -1,0 +1,62 @@
+
+.container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  
+  .input-group-text {
+    background-color: #e0e0e0;
+  }
+  
+  .in-progress-section, .completed-section {
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    transition: background-color 0.3s ease;
+  }
+  
+  .in-progress-section {
+    border-left: 5px solid #007bff;
+  }
+  
+  .completed-section {
+    border-left: 5px solid #28a745;
+  }
+  
+  /* Hover effect */
+  .completed-section.hovering {
+    background-color: #e0ffe0; /* Light green when hovering */
+  }
+  
+  .task-card {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .task-card:hover {
+    transform: scale(1.02);
+    background-color: #f1f1f1;
+  }
+  
+  .task-icons i {
+    margin-left: 10px;
+    color: #007bff;
+  }
+  
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  .card {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .badge {
+    font-size: 1rem;
+    padding: 0.5em;
+  }
+  
