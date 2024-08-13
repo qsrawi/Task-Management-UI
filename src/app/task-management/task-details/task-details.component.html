@@ -9,10 +9,16 @@
           <form [formGroup]="taskForm">
             <div class="mb-4">
               <div class="mb-4 d-flex align-items-center justify-content-between">
-                <label for="title" class="form-label">Task Name</label>
-                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#logsModal">
-                  <i class="fas fa-history me-2"></i>View Logs
-                </button>
+                <div class="d-flex align-items-center">
+                  <label for="title" class="form-label me-2">Task Name</label>
+                  <button type="button" class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#logsModal">
+                    <i class="fas fa-history me-2"></i>View Logs
+                  </button>
+                  <!-- User Reassign Dropdown -->
+                  <select class="form-select form-select-sm" formControlName="assignedToUserId">
+                    <option *ngFor="let user of users$ | async" [value]="user.id">{{ user.userName }}</option>
+                  </select>
+                </div>
               </div>
               <input type="text" id="title" class="form-control form-control-lg" formControlName="title" [readonly]="!isEditing">
             </div>
@@ -55,7 +61,7 @@
               <i class="fas fa-plus me-2"></i>Add Note
             </button>
             <div *ngIf="showAddNoteInput" class="input-group mt-3">
-              <input type="text" class="form-control" placeholder="Enter your note..." [(ngModel)]="newNote">
+              <input type="text" class="form-control" placeholder="Enter your note..." formControlName="newNote">
               <button class="btn btn-sm btn-primary" (click)="addNote()">
                 <i class="fas fa-paper-plane me-2"></i>Submit
               </button>

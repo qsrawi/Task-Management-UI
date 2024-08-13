@@ -5,6 +5,7 @@ import { UserService } from '../../services/user.service';
 import { Observable, of } from 'rxjs';
 import { CreateTaskNoteDto, TaskDto, TaskNoteDto } from '../../models/task';
 import { ToastrService } from 'ngx-toastr';
+import { UserDto } from '../../models/login-user-dto';
 
 @Component({
   selector: 'app-task-details',
@@ -13,6 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class TaskDetailsComponent implements OnInit {
   notes$: Observable<TaskNoteDto[]> = of([]);
+  users$: Observable<UserDto[]> = of([]);
   
   taskForm!: FormGroup;
   task: any;
@@ -20,7 +22,8 @@ export class TaskDetailsComponent implements OnInit {
   showAddNoteInput: boolean = false; 
   newNote: string = ''; 
   showLogs: boolean = false;
-  userId: number = 0;
+  userId: string | null = "";
+  selectedUserId: number = 0;
 
   constructor(
     private router: Router,
@@ -33,16 +36,37 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userId = Number(localStorage.getItem('userId'));
+    this.userId = localStorage.getItem('userId')
     this.taskForm = this.fb.group({
       title: [this.task?.title || ''],
-      description: [this.task?.description || '']
+      description: [this.task?.description || ''],
+      assignedToUserId: [this.task?.assignedToUserId || ''] 
     });
     this.fetchNotes(this.task?.id);
+    this.fetchUsers();
+
+    this.taskForm.get('assignedToUserId')?.valueChanges.subscribe(userId => {
+      this.reassignTask(userId);
+    });
   }
 
   fetchNotes(taskId: number): void {
     this.notes$ = this.userService.getNotesByTask(taskId)
+  }
+
+  fetchUsers(): void {
+    this.users$ = this.userService.getUsers();
+  }
+
+  reassignTask(userId: string): void {
+    this.userService.assignTask(this.task.id, userId).subscribe(
+      () => {
+        this.toastr.success('Task reassigned successfully', 'Success');
+      },
+      (error) => {
+        this.toastr.error('Error reassigning task', 'Error');
+      }
+    );
   }
 
   onEdit(): void {
@@ -59,7 +83,7 @@ export class TaskDetailsComponent implements OnInit {
       assignedToUserName: this.task.assignedToUserName,
       createdAt: this.task.createdAt,
       isClosed: this.task.isClosed,
-      creatorUserId: this.userId
+      creatorUserId: Number(this.userId)
     };
 
     this.userService.updateTask(updatedTask).subscribe(

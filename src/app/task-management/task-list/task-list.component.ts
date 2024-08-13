@@ -4,7 +4,7 @@ import { delay, map, Observable, of, tap } from 'rxjs';
 import { TaskDto } from '../../models/task';
 import { UserService } from '../../services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AdminService } from '../../services/user.service copy';
+import { AdminService } from '../../services/admin.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({

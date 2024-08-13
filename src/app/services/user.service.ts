@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CreateTaskNoteDto, TaskDto, TaskLogsDto, TaskNoteDto } from '../models/task';
 import { HttpClient } from '@angular/common/http';
+import { UserDto } from '../models/login-user-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,14 @@ export class UserService {
 
   getTaskLogsByTaskId(taskId: number): Observable<TaskLogsDto[]> {
     return this.http.get<TaskLogsDto[]>(`${this.userApiUrl}/GetTaskLogs/${taskId}`);
+  }
+
+  getUsers(): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(`${this.userApiUrl}/GetUsers`);
+  }
+
+  assignTask(taskId: number, userId: string): Observable<void> {
+    return this.http.post<void>(`${this.userApiUrl}/AssignTask/${taskId}/${userId}`, {});
   }
 
   closeTask(taskId: number): Observable<void> {

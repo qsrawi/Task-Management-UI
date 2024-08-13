@@ -132,6 +132,20 @@
     margin-right: 0.5rem;
   }
 
+  .form-select-sm {
+    width: 150px; /* Make the dropdown small */
+    margin-left: 10px;
+    font-size: 0.875rem; /* Smaller font size */
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+  }
+  
+  .form-select-sm:focus {
+    border-color: #007bff;
+    box-shadow: none;
+  }
+
   /* task-details.component.css */
 .quill-editor {
   height: 150px; /* Set a smaller height for the editor */
