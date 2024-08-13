@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { Observable, of } from 'rxjs';
 import { UserDto } from '../../models/login-user-dto';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-task',
@@ -22,7 +23,7 @@ export class AddTaskComponent implements OnInit {
       [{ 'header': 1 }, { 'header': 2 }],
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['clean'],
+      [],
       ['link', 'image']
     ]
   };
@@ -30,6 +31,7 @@ export class AddTaskComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private adminService: AdminService,
+    private toastr: ToastrService,
     private router: Router
   ) {
     this.users$ = this.adminService.getUsers();
@@ -51,7 +53,7 @@ export class AddTaskComponent implements OnInit {
         creatorUserId: this.userId
       };
       this.adminService.createTask(newTask).subscribe(() => {
-        alert('Task created successfully');
+        this.toastr.success('Task deleted successfully', 'Success');
         this.router.navigate(['/admin/task-list', this.userId]);
       });
     }
