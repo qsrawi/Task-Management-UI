@@ -3,7 +3,12 @@
       <div class="arrow">
         <div class="action">
           <span *ngIf="log.action === 'Create'">Create</span>
-          <span *ngIf="log.action === 'Update'">Update {{ log.fieldName }} to "{{ log.value }}"</span>
+          <span *ngIf="log.action === 'Update'">
+            Update {{ log.fieldName }}
+            <ng-container *ngIf="log.fieldName !== 'Description'">
+              to "{{ log.value }}"
+            </ng-container>
+          </span>
           <span *ngIf="log.action === 'Assigned'">Assigned to {{ log.value }}</span>
         </div>
         <div class="line"></div>
