@@ -66,7 +66,10 @@ export class TaskDetailsComponent implements OnInit {
       this.fetchUsers();
 
       this.taskForm.get('assignedToUserId')?.valueChanges.subscribe(userId => {
-        this.reassignTask(userId);
+        if (userId && !this.taskForm.get('assignedToUserId')?.disabled) {
+          this.reassignTask(userId);
+          this.taskForm.get('assignedToUserId')?.disable();
+        }
       });
     }
   }
