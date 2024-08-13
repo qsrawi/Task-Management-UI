@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { UserService } from '../../services/user.service';
@@ -9,6 +9,7 @@ import { UserDto } from '../../models/login-user-dto';
 import { AdminService } from '../../services/admin.service';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { TaskLogsComponent } from '../task-logs/task-logs.component';
 
 @Component({
   selector: 'app-task-details',
@@ -16,6 +17,8 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./task-details.component.css']
 })
 export class TaskDetailsComponent implements OnInit {
+  @ViewChild(TaskLogsComponent) taskLogsComponent!: TaskLogsComponent;
+
   notes$: Observable<TaskNoteDto[]> = of([]);
   users$: Observable<UserDto[]> = of([]);
   
@@ -81,7 +84,7 @@ export class TaskDetailsComponent implements OnInit {
       () => {
         this.toastr.success('Task reassigned successfully', 'Success');
       },
-      (error) => {
+      () => {
         this.toastr.error('Error reassigning task', 'Error');
       }
     );
@@ -110,7 +113,7 @@ export class TaskDetailsComponent implements OnInit {
         this.isEditing = false;
         this.toastr.success('Task updated successfully', 'Success');
       },
-      (error) => {
+      () => {
         this.toastr.error('Error updating task', 'Error');
       }
     );
@@ -139,9 +142,10 @@ export class TaskDetailsComponent implements OnInit {
           this.notes$ = this.userService.getNotesByTask(this.task.id);
           this.taskForm.get('newNote')?.setValue('');
           this.showAddNoteInput = false;
+          this.toastr.success('Note added successfully', 'Success');
         },
-        (error) => {
-          console.error('Error adding note:', error);
+        () => {
+          this.toastr.error('Error adding note', 'Error');
         }
       );
 
@@ -151,9 +155,10 @@ export class TaskDetailsComponent implements OnInit {
           this.notes$ = this.adminService.getNotesByTask(this.task.id);
           this.taskForm.get('newNote')?.setValue('');
           this.showAddNoteInput = false;
+          this.toastr.success('Note added successfully', 'Success');
         },
-        (error) => {
-          console.error('Error adding note:', error);
+        () => {
+          this.toastr.error('Error adding note', 'Error');
         }
       );
   }
@@ -167,16 +172,20 @@ export class TaskDetailsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.adminService.deleteTask(this.task.id).subscribe(() => {
-          console.log('Task deleted successfully');
+          this.toastr.success('Task deleted successfully', 'Success');
           this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`, this.userId]);
         });
       } else {
-        console.log('Task deletion was canceled');
+        this.toastr.error('Task deletion was canceled', 'Error');
       }
     });
   }
 
   toggleAddNote(): void {
     this.showAddNoteInput = !this.showAddNoteInput;
+  }
+
+  refreshLogs(): void {
+    this.taskLogsComponent.fetchLogs(this.task.id); // Call the fetchLogs method from TaskLogsComponent
   }
 }

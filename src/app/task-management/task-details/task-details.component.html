@@ -11,10 +11,9 @@
               <div class="mb-4 d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
                   <label for="title" class="form-label me-2">Task Name</label>
-                  <button type="button" class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#logsModal">
+                  <button type="button" class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#logsModal" (click)="refreshLogs()">
                     <i class="fas fa-history me-2"></i>View Logs
                   </button>
-                  <!-- User Reassign Dropdown -->
                   <select *ngIf="isEditable" class="form-select form-select-sm" formControlName="assignedToUserId">
                     <option *ngFor="let user of users$ | async" [value]="user.id">{{ user.userName }}</option>
                   </select>
