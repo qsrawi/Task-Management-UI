@@ -15,7 +15,7 @@
                     <i class="fas fa-history me-2"></i>View Logs
                   </button>
                   <!-- User Reassign Dropdown -->
-                  <select class="form-select form-select-sm" formControlName="assignedToUserId">
+                  <select *ngIf="isEditable" class="form-select form-select-sm" formControlName="assignedToUserId">
                     <option *ngFor="let user of users$ | async" [value]="user.id">{{ user.userName }}</option>
                   </select>
                 </div>
@@ -43,31 +43,34 @@
               </div>
             </div>
             <div class="d-flex justify-content-end mt-4">
-              <button *ngIf="!isEditing" type="button" class="btn btn-primary btn-lg me-3 px-4" (click)="onEdit()">
+              <button *ngIf="isEditable && !isEditing" type="button" class="btn btn-primary btn-lg me-3 px-4" (click)="onEdit()">
                 <i class="fas fa-edit me-2"></i>Edit
               </button>
-              <button *ngIf="isEditing" type="button" class="btn btn-success btn-lg me-3 px-4" (click)="onSave()">
+              <button *ngIf="isEditable && isEditing" type="button" class="btn btn-success btn-lg me-3 px-4" (click)="onSave()">
                 <i class="fas fa-save me-2"></i>Save
               </button>
               <button type="button" class="btn btn-secondary btn-lg px-4" (click)="onCancel()">
                 <i class="fas fa-times me-2"></i>Cancel
               </button>
-            </div>
-          </form>
-
-          <!-- Add Note Section -->
-          <div class="mt-4">
-            <button type="button" class="btn btn-sm btn-info" (click)="toggleAddNote()">
-              <i class="fas fa-plus me-2"></i>Add Note
-            </button>
-            <div *ngIf="showAddNoteInput" class="input-group mt-3">
-              <input type="text" class="form-control" placeholder="Enter your note..." formControlName="newNote">
-              <button class="btn btn-sm btn-primary" (click)="addNote()">
-                <i class="fas fa-paper-plane me-2"></i>Submit
+              <button *ngIf="userRole =='Admin'"type="button" class="btn btn-danger btn-lg ms-3 px-4" (click)="onDeleteTask()">
+                <i class="fas fa-trash me-2"></i>Delete
               </button>
             </div>
-          </div>
 
+            <!-- Add Note Section -->
+            <div class="mt-4">
+              <button type="button" class="btn btn-sm btn-info" (click)="toggleAddNote()">
+                <i class="fas fa-plus me-2"></i>Add Note
+              </button>
+              <div *ngIf="showAddNoteInput" class="input-group mt-3">
+                <input type="text" class="form-control" placeholder="Enter your note..." formControlName="newNote">
+                <button class="btn btn-sm btn-primary" (click)="addNote()">
+                  <i class="fas fa-paper-plane me-2"></i>Submit
+                </button>
+              </div>
+            </div>
+
+          </form>
         </div>
       </div>
     </div>
@@ -83,7 +86,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <app-task-logs [taskId]="task.id"></app-task-logs>
+        <app-task-logs [userRole]="userRole" [taskId]="task.id"></app-task-logs>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

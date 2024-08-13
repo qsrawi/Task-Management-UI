@@ -1,0 +1,56 @@
+.card {
+  border-radius: 10px;
+}
+
+.card-header {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.quill-editor {
+  min-height: 200px;
+}
+
+.form-control-lg, .form-select-lg {
+  border-radius: 5px;
+}
+
+.btn-lg {
+  font-size: 1.25rem;
+  padding: 10px 20px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+.container {
+  max-width: 900px;
+}
+
+/* Small and Pretty Select */
+.pretty-select {
+  width: 150px; /* Small width */
+  padding: 5px 10px;
+  font-size: 0.875rem; /* Small font size */
+  border-radius: 5px;
+  background-color: #f8f9fa; /* Light grey background */
+  border: 1px solid #ced4da; /* Subtle border */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+.pretty-select:hover {
+  border-color: #007bff; /* Blue border on hover */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3); /* Light blue shadow on hover */
+}
+
+.pretty-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5); /* Stronger blue shadow on focus */
+}

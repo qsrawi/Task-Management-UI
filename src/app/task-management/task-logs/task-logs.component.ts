@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { UserService } from '../../services/user.service';
 import { Observable, of } from 'rxjs';
 import { TaskLogsDto } from '../../models/task';
+import { AdminService } from '../../services/admin.service';
 
 @Component({
   selector: 'app-task-logs',
@@ -10,17 +11,16 @@ import { TaskLogsDto } from '../../models/task';
 })
 export class TaskLogsComponent implements OnInit {
   @Input() taskId!: number;
+  @Input() userRole!: string | null;
   logs$: Observable<TaskLogsDto[]> = of([]);
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private adminService: AdminService) { }
 
   ngOnInit(): void {
     this.fetchLogs(this.taskId);
   }
 
   fetchLogs(taskId: number): void {
-    this.logs$ = this.userService.getTaskLogsByTaskId(taskId)
-    this.userService.getTaskLogsByTaskId(taskId).subscribe(x => console.log(x));
-  
+    this.logs$ = this.userRole == "User" ? this.userService.getTaskLogsByTaskId(taskId) :  this.adminService.getTaskLogsByTaskId(taskId);
   }
 }

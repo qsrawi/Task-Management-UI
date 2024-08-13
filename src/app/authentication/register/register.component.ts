@@ -24,6 +24,7 @@ export class RegisterComponent {
         localStorage.setItem('userName', response.userName);
         localStorage.setItem('userId', response.id);
         localStorage.setItem('userRole', response.role);
+        localStorage.setItem("isAllTasks", "false");
         this.router.navigate(['/auth/login']);
       },
       (error) => {

@@ -1,14 +1,21 @@
 export interface TaskDto {
-    id: number;
-    title: string;
-    description: string;
-    assignedToUserId: number;
-    assignedToUserName: string;
-    createdAt: Date;
-    isClosed: boolean;
-    creatorUserId?: number;
-    notesCount?: number;
-  }
+  id: number;
+  title: string;
+  description: string;
+  assignedToUserId: number;
+  assignedToUserName: string;
+  createdAt: Date;
+  isClosed: boolean;
+  creatorUserId?: number;
+  notesCount?: number;
+}
+
+export interface CreateTaskDto {
+  creatorUserId: number;
+  title: string;
+  description: string;
+  assignedToUserId: number;
+}
   
 export interface TaskNoteDto {
   id: number;

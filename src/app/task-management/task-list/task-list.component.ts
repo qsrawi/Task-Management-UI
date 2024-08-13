@@ -45,7 +45,7 @@ export class TaskListComponent implements OnInit {
   }
 
   onTaskClick(task: TaskDto): void {
-    this.router.navigate(['/user/task-details'], { state: { task } });
+    this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-details`], { state: { task } });
   }
 
   drop(event: CdkDragDrop<TaskDto[]>): void {

@@ -6,6 +6,9 @@ import { Observable, of } from 'rxjs';
 import { CreateTaskNoteDto, TaskDto, TaskNoteDto } from '../../models/task';
 import { ToastrService } from 'ngx-toastr';
 import { UserDto } from '../../models/login-user-dto';
+import { AdminService } from '../../services/admin.service';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-task-details',
@@ -23,35 +26,50 @@ export class TaskDetailsComponent implements OnInit {
   newNote: string = ''; 
   showLogs: boolean = false;
   userId: string | null = "";
+  userRole: string | null = "";
   selectedUserId: number = 0;
+  isEditable: boolean = true;
 
   constructor(
     private router: Router,
     private fb: FormBuilder,
     private toastr: ToastrService,
-    private userService: UserService
+    private userService: UserService,
+    private adminService: AdminService,
+    private dialog: MatDialog
   ) {
     const navigation = this.router.getCurrentNavigation();
     this.task = navigation?.extras?.state?.['task'];
   }
 
   ngOnInit(): void {
-    this.userId = localStorage.getItem('userId')
+    this.userId = localStorage.getItem('userId');
+    this.userRole = localStorage.getItem('userRole');
+    const isAllTasks = localStorage.getItem('isAllTasks');
+
+    if(this.userRole === "Admin" || isAllTasks === "true" || this.task?.isClosed == true)
+      this.isEditable = false;
+
     this.taskForm = this.fb.group({
       title: [this.task?.title || ''],
       description: [this.task?.description || ''],
-      assignedToUserId: [this.task?.assignedToUserId || ''] 
+      assignedToUserId: [this.task?.assignedToUserId || ''],
+      newNote: ['']
     });
-    this.fetchNotes(this.task?.id);
-    this.fetchUsers();
 
-    this.taskForm.get('assignedToUserId')?.valueChanges.subscribe(userId => {
-      this.reassignTask(userId);
-    });
+    this.fetchNotes(this.task?.id);
+
+    if(this.userRole === "User"){
+      this.fetchUsers();
+
+      this.taskForm.get('assignedToUserId')?.valueChanges.subscribe(userId => {
+        this.reassignTask(userId);
+      });
+    }
   }
 
   fetchNotes(taskId: number): void {
-    this.notes$ = this.userService.getNotesByTask(taskId)
+    this.notes$ = this.userRole === "User" ? this.userService.getNotesByTask(taskId) : this.adminService.getNotesByTask(taskId);
   }
 
   fetchUsers(): void {
@@ -99,29 +117,63 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   onCancel(): void {
+    localStorage.setItem("isAllTasks", "false");
     this.isEditing = false;
-    this.router.navigate(['/']);
+    this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`, this.userId]);
   }
 
   addNote(): void {
-    if (this.newNote.trim() === '') return;
-
+    const newNoteText = this.taskForm.get('newNote')?.value;
+  
+    if (newNoteText.trim() === '') return;
+  
     const newNoteDto: CreateTaskNoteDto = {
-      userId: 3,
+      userId: Number(this.userId),
       taskItemId: this.task.id,
-      note: this.newNote.trim()
+      note: newNoteText.trim()
     };
+  
+    if (this.userRole === "User")
+      this.userService.addNote(newNoteDto).subscribe(
+        () => {
+          this.notes$ = this.userService.getNotesByTask(this.task.id);
+          this.taskForm.get('newNote')?.setValue('');
+          this.showAddNoteInput = false;
+        },
+        (error) => {
+          console.error('Error adding note:', error);
+        }
+      );
 
-    this.userService.addNote(newNoteDto).subscribe(
-      (note) => {
-        this.notes$ = this.userService.getNotesByTask(this.task.id);
-        this.newNote = '';
-        this.showAddNoteInput = false;
-      },
-      (error) => {
-        console.error('Error adding note:', error);
+    else
+      this.adminService.addNote(newNoteDto).subscribe(
+        () => {
+          this.notes$ = this.adminService.getNotesByTask(this.task.id);
+          this.taskForm.get('newNote')?.setValue('');
+          this.showAddNoteInput = false;
+        },
+        (error) => {
+          console.error('Error adding note:', error);
+        }
+      );
+  }
+
+  onDeleteTask(): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px',
+      data: { message: 'Are you sure you want to delete this task?' }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.adminService.deleteTask(this.task.id).subscribe(() => {
+          console.log('Task deleted successfully');
+          this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`, this.userId]);
+        });
+      } else {
+        console.log('Task deletion was canceled');
       }
-    );
+    });
   }
 
   toggleAddNote(): void {

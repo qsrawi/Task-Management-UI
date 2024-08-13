@@ -24,7 +24,8 @@ export class LoginComponent {
         localStorage.setItem('userName', response.userName);
         localStorage.setItem('userId', response.id);
         localStorage.setItem('userRole', response.role);
-        this.router.navigate(['/user/task-list', response.id]);
+        localStorage.setItem("isAllTasks", "false");
+        this.router.navigate([`/${response.role.toLowerCase()}/task-list`, response.id]);
       },
       (error) => {
         this.loginError = 'Login failed. Please check your user name and password.';

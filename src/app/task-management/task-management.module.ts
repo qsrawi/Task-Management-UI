@@ -8,13 +8,17 @@ import { HeaderNavComponent } from './header-nav/header-nav.component';
 import { TaskDetailsComponent } from './task-details/task-details.component';
 import { TaskLogsComponent } from './task-logs/task-logs.component';
 import { QuillModule } from 'ngx-quill';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { AddTaskComponent } from './add-task/add-task.component';
 
 @NgModule({
   declarations: [
     TaskListComponent,
     TaskDetailsComponent,
     HeaderNavComponent,
-    TaskLogsComponent
+    TaskLogsComponent,
+    AddTaskComponent
   ],
   imports: [
     CommonModule,
@@ -24,7 +28,9 @@ import { QuillModule } from 'ngx-quill';
     CdkDropListGroup,
     CdkDropList,
     CdkDrag,
-    QuillModule.forRoot()
+    QuillModule.forRoot(),
+    MatDialogModule,
+    MatButtonModule
   ]
 })
 export class TaskManagementModule { }
