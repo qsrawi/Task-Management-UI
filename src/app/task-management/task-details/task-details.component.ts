@@ -90,7 +90,6 @@ export class TaskDetailsComponent implements OnInit {
       });
     }
   
-    // Initialize relatedNameOptions based on the existing relatedTo value
     const relatedTo = this.taskForm.get('relatedTo')?.value;
     if (relatedTo) {
       this.updateRelatedNameOptions(relatedTo);
@@ -108,6 +107,7 @@ export class TaskDetailsComponent implements OnInit {
   reassignTask(userId: string): void {
     this.userService.assignTask(this.task.id, userId).subscribe(
       () => {
+        this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`, this.userId]);
         this.toastr.success('Task reassigned successfully', 'Success');
       },
       () => {
@@ -229,14 +229,13 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   refreshLogs(): void {
-    this.taskLogsComponent.fetchLogs(this.task.id); // Call the fetchLogs method from TaskLogsComponent
+    this.taskLogsComponent.fetchLogs(this.task.id);
   }
 
   onRelatedToChange(event: Event): void {
     const relatedTo = (event.target as HTMLSelectElement).value;
     this.updateRelatedNameOptions(relatedTo);
   
-    // Reset the relatedName field if the relatedTo field changes
     this.taskForm.get('relatedName')?.setValue('');
   }
   

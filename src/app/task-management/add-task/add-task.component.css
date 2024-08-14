@@ -16,12 +16,11 @@
   border-radius: 5px;
 }
 
-/* Adjusted Task Title and Assign to User */
 .form-group.row .form-control,
 .form-group.row .form-select {
-  max-width: 48%; /* Ensure both have the same width */
+  max-width: 48%; 
   display: inline-block;
-  margin-right: 2%; /* Adjust spacing */
+  margin-right: 2%;
 }
 
 .form-control-lg,
@@ -35,18 +34,16 @@
   padding: 8px 12px;
 }
 
-/* Adjust Space between Description and Related */
 .mb-4 {
   margin-bottom: 1.5rem;
 }
 
-/* Improved Selectors Design */
 .pretty-select,
 .form-control,
 .form-select {
-  width: 100%; /* Full width */
+  width: 100%; 
   padding: 8px 12px;
-  font-size: 1rem; /* Adjusted font size for better readability */
+  font-size: 1rem;
   border-radius: 5px;
   background-color: #f8f9fa;
   border: 1px solid #ced4da;
@@ -68,10 +65,9 @@
   box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
 }
 
-/* Reduced Button Size */
 .btn-lg {
-  font-size: 1rem; /* Smaller font size */
-  padding: 8px 16px; /* Reduced padding */
+  font-size: 1rem;
+  padding: 8px 16px;
 }
 
 .btn-primary {

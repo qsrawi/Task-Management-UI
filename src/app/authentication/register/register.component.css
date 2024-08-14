@@ -12,13 +12,13 @@
   }
   
   .card-header {
-    background-color: #2acbaa; /* Matches the background color */
+    background-color: #2acbaa;
     padding: 10px;
   }
   
   .card-title {
     margin: 0;
-    color: white; /* White text color for the header */
+    color: white;
     font-size: 1.5rem;
   }
   

@@ -6,7 +6,7 @@
 }
 
 .state {
-    flex: 1 1 calc(25% - 20px); /* Each item takes up 25% of the container width, minus the gap */
+    flex: 1 1 calc(25% - 20px);
     max-width: calc(25% - 20px);
     text-align: center;
     margin-bottom: 20px;
@@ -22,14 +22,14 @@
 
 .action {
     position: absolute;
-    top: -30px; /* Increased to give more space above the line */
+    top: -30px;
     font-weight: bold;
     font-size: 14px;
     color: #5a5a5a;
     text-align: center;
     width: 100%;
-    line-height: 1.2; /* Adjusted line height */
-    padding-bottom: 5px; /* Space between text and line */
+    line-height: 1.2;
+    padding-bottom: 5px;
 }
 
 .line {
@@ -64,5 +64,5 @@
 }
 
 .state:last-child .arrow .line {
-    display: none; /* Hide the line for the last state */
+    display: none;
 }

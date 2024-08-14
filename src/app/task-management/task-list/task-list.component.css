@@ -4,7 +4,6 @@
   min-height: 100vh;
 }
 
-/* Search Bar Styling */
 .search-bar {
   font-size: 0.9rem;
   padding: 0.5rem;
@@ -24,7 +23,6 @@
   overflow: hidden;
 }
 
-/* Section Styling */
 .in-progress-section, .completed-section {
   padding: 1rem;
   border-radius: 8px;
@@ -42,10 +40,9 @@
 }
 
 .completed-section.hovering {
-  background-color: #e0ffe0; /* Light green when hovering */
+  background-color: #e0ffe0; 
 }
 
-/* Task Card Styling */
 .task-card {
   cursor: pointer;
   transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
@@ -65,25 +62,21 @@
   color: #007bff;
 }
 
-/* Smaller Task Card Titles */
 .card-title {
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 0.25rem;
 }
 
-/* Badge Styling */
 .badge {
   font-size: 0.9rem;
   padding: 0.35em 0.75em;
 }
 
-/* Text Sizing */
 .card-text {
   font-size: 0.85rem;
 }
 
-/* Button and Icon Alignment */
 .card .btn i {
   margin-right: 0.25rem;
 }

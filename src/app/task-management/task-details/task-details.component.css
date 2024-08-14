@@ -1,14 +1,12 @@
-/* Container styling */
 .container {
   max-width: 1000px;
   max-height: 1000px;
 }
 
-/* Card styling */
 .custom-card {
   border-radius: 10px;
   overflow: hidden;
-  background-color: #f4f6f8; /* Subtle grey background for the card */
+  background-color: #f4f6f8;
 }
 
 .custom-card-header {
@@ -22,13 +20,11 @@
   padding: 2rem;
 }
 
-/* Form label styling */
 .form-label {
   font-weight: bold;
   font-size: 1rem;
 }
 
-/* Form control styling */
 .form-control-sm {
   font-size: 0.9rem;
   border-radius: 5px;
@@ -43,7 +39,6 @@
   box-shadow: 0 0 0 0.2rem rgba(106, 17, 203, 0.25);
 }
 
-/* Notes styling */
 .card-text {
   font-size: 1rem;
   color: #333;
@@ -66,7 +61,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Button styling */
 .btn {
   border-radius: 5px;
   padding: 0.5rem 1.5rem;
@@ -114,7 +108,6 @@
   border-color: #dae0e5;
 }
 
-/* Add Note Input */
 .add-note-textarea {
   background-color: #f8f9fa;
   border: 1px solid #ced4da;
@@ -131,7 +124,6 @@
   font-style: italic;
 }
 
-/* Styling for Submit Button */
 .add-note-textarea + .d-flex .btn-primary {
   background-color: #6a11cb;
   border-color: #6a11cb;
@@ -143,7 +135,6 @@
   border-color: #4e0a9f;
 }
 
-/* Custom styling for selects and inputs */
 .form-select-sm {
   width: 100%;
   font-size: 0.875rem;

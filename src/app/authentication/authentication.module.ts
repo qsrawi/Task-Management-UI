@@ -26,12 +26,6 @@ import { BrowserModule } from '@angular/platform-browser';
     AuthenticationRoutingModule
   ],
   providers: [
-    // AuthService, // Authentication service
-    // {
-    //   provide: HTTP_INTERCEPTORS,
-    //   useClass: authInterceptor, // Register the HTTP interceptor
-    //   multi: true
-    // }
   ]
 })
 export class AuthenticationModule { }
