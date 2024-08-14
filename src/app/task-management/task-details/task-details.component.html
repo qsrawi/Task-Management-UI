@@ -1,74 +1,109 @@
 <div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-md-8">
-      <div class="card shadow-lg border-0">
-        <div class="card-header bg-primary text-white text-center">
+      <div class="card shadow-lg border-0 custom-card">
+        <div class="card-header d-flex justify-content-between align-items-center custom-card-header">
           <h4 class="mb-0">Task Details</h4>
+          <div>
+            <button type="button" class="btn btn-sm btn-light me-2" data-bs-toggle="modal" data-bs-target="#logsModal" (click)="refreshLogs()" title="View Logs">
+              <i class="fas fa-history"></i>
+            </button>
+            <button *ngIf="isEditable && !isEditing" type="button" class="btn btn-sm btn-light me-2" (click)="onEdit()" title="Edit Task">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button *ngIf="isEditable && isEditing" type="button" class="btn btn-sm btn-success me-2" (click)="onSave()" title="Save Task">
+              <i class="fas fa-save"></i>
+            </button>
+            <button *ngIf="userRole == 'Admin'" type="button" class="btn btn-sm btn-light" (click)="onDeleteTask()" title="Delete Task">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
-        <div class="card-body p-4">
+        <div class="card-body p-4 custom-card-body">
           <form [formGroup]="taskForm">
-            <div class="mb-4">
-              <div class="mb-4 d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
-                  <label for="title" class="form-label me-2">Task Name</label>
-                  <button type="button" class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#logsModal" (click)="refreshLogs()">
-                    <i class="fas fa-history me-2"></i>View Logs
-                  </button>
-                  <select *ngIf="isEditable" class="form-select form-select-sm" formControlName="assignedToUserId">
-                    <option *ngFor="let user of users$ | async" [value]="user.id">{{ user.userName }}</option>
-                  </select>
-                </div>
+            <!-- Task Title and User Assignment Row -->
+            <div class="row mb-3">
+              <div class="col-md-8 mb-3">
+                <label for="title" class="form-label">Task Name</label>
+                <input type="text" id="title" class="form-control form-control-sm" formControlName="title" [readonly]="!isEditing">
               </div>
-              <input type="text" id="title" class="form-control form-control-lg" formControlName="title" [readonly]="!isEditing">
+              <div *ngIf="isEditable" class="col-md-4 mb-3">
+                <label for="assignedToUserId" class="form-label">Assign to User</label>
+                <select id="assignedToUserId" class="form-select form-select-sm" formControlName="assignedToUserId">
+                  <option *ngFor="let user of users$ | async" [value]="user.id">{{ user.userName }}</option>
+                </select>
+              </div>
             </div>
-            <div class="mb-4">
+
+            <!-- Task Description -->
+            <div class="mb-3">
               <label for="description" class="form-label">Description</label>
-              <quill-editor id="description" formControlName="description" [readOnly]="!isEditing" class="quill-editor"></quill-editor>
+              <br>
+              <quill-editor id="description" formControlName="description" [modules]="quillConfig" [readOnly]="!isEditing" class="quill-editor"></quill-editor>
             </div>
-            <div class="mb-4">
-              <label class="form-label">Notes</label>
-              <div class="row">
-                <div class="col-md-12" *ngFor="let note of notes$ | async">
-                  <div class="card mb-3 shadow-sm">
-                    <div class="card-body">
-                      <p class="card-text mb-1">{{ note.note }}</p>
-                      <small class="text-muted">
-                        <strong>From:</strong> {{ note.userName }}<br>
-                        <strong>Created At:</strong> {{ note.createdAt | date: 'short' }}
-                      </small>
-                    </div>
-                  </div>
-                </div>
+
+            <!-- Related To and Related Name Row -->
+            <div class="row mb-3">
+              <div class="col-md-6 mb-3">
+                <label for="relatedTo" class="form-label">Related To</label>
+                <select id="relatedTo" class="form-select form-select-sm" formControlName="relatedTo" [disabled]="!isEditing" (change)="onRelatedToChange($event)">
+                  <option value="" disabled>Select related to</option>
+                  <option value="Project">Project</option>
+                  <option value="Company">Company</option>
+                  <option value="Personal">Personal</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="relatedName" class="form-label">Related Name</label>
+                <select id="relatedName" class="form-select form-select-sm" formControlName="relatedName" [disabled]="!isEditing">
+                  <option value="" disabled>Select related name</option>
+                  <option *ngFor="let option of relatedNameOptions" [value]="option">{{ option }}</option>
+                </select>
               </div>
             </div>
-            <div class="d-flex justify-content-end mt-4">
-              <button *ngIf="isEditable && !isEditing" type="button" class="btn btn-primary btn-lg me-3 px-4" (click)="onEdit()">
-                <i class="fas fa-edit me-2"></i>Edit
-              </button>
-              <button *ngIf="isEditable && isEditing" type="button" class="btn btn-success btn-lg me-3 px-4" (click)="onSave()">
-                <i class="fas fa-save me-2"></i>Save
-              </button>
-              <button type="button" class="btn btn-secondary btn-lg px-4" (click)="onCancel()">
-                <i class="fas fa-times me-2"></i>Cancel
-              </button>
-              <button *ngIf="userRole =='Admin'"type="button" class="btn btn-danger btn-lg ms-3 px-4" (click)="onDeleteTask()">
-                <i class="fas fa-trash me-2"></i>Delete
-              </button>
+
+            <!-- Start Date and Deadline Row -->
+            <div class="row mb-3">
+              <div class="col-md-6 mb-3">
+                <label for="startDate" class="form-label">Start Date</label>
+                <input type="date" id="startDate" class="form-control form-control-sm custom-input" formControlName="startDate" [disabled]="!isEditing">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="deadLine" class="form-label">Deadline</label>
+                <input type="date" id="deadLine" class="form-control form-control-sm custom-input" formControlName="deadLine" [disabled]="!isEditing">
+              </div>
+            </div>
+
+            <!-- Notes Section -->
+            <div class="mb-3">
+              <label class="form-label">Notes</label>
+              <div *ngFor="let note of notes$ | async" class="card mb-2 shadow-sm border-light rounded note-card">
+                <div class="card-body p-2">
+                  <p class="card-text mb-1">{{ note.note }}</p>
+                  <small class="text-muted">
+                    <strong>From:</strong> {{ note.userName }}<br>
+                    <strong>Created At:</strong> {{ note.createdAt | date: 'short' }}
+                  </small>
+                </div>
+              </div>
             </div>
 
             <!-- Add Note Section -->
-            <div class="mt-4">
-              <button type="button" class="btn btn-sm btn-info" (click)="toggleAddNote()">
-                <i class="fas fa-plus me-2"></i>Add Note
-              </button>
-              <div *ngIf="showAddNoteInput" class="input-group mt-3">
-                <input type="text" class="form-control" placeholder="Enter your note..." formControlName="newNote">
+            <div class="mt-3">
+              <textarea class="form-control add-note-textarea" placeholder="Add a note..." formControlName="newNote"></textarea>
+              <div class="d-flex justify-content-end mt-2">
                 <button class="btn btn-sm btn-primary" (click)="addNote()">
-                  <i class="fas fa-paper-plane me-2"></i>Submit
+                  <i class="fas fa-paper-plane me-1"></i>Submit
                 </button>
               </div>
             </div>
 
+            <!-- Save and Cancel Buttons -->
+            <div class="d-flex justify-content-end mt-4">
+              <button type="button" class="btn btn-secondary btn-sm px-3" (click)="onCancel()">
+                <i class="fas fa-times me-1"></i>Cancel
+              </button>
+            </div>
           </form>
         </div>
       </div>
@@ -88,7 +123,7 @@
         <app-task-logs [userRole]="userRole" [taskId]="task.id"></app-task-logs>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

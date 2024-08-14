@@ -8,6 +8,11 @@ export interface TaskDto {
   isClosed: boolean;
   creatorUserId?: number;
   notesCount?: number;
+  relatedTo: string;
+  relatedName: string;
+  createdBy: string;
+  startDate: Date;
+  deadLine: Date;
 }
 
 export interface CreateTaskDto {
@@ -15,6 +20,11 @@ export interface CreateTaskDto {
   title: string;
   description: string;
   assignedToUserId: number;
+  relatedTo: string;
+  relatedName: string;
+  createdBy: string;
+  startDate: Date;
+  deadLine: Date;
 }
   
 export interface TaskNoteDto {

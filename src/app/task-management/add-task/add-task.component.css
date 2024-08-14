@@ -8,16 +8,70 @@
 }
 
 .quill-editor {
-  min-height: 200px;
+  min-height: 50px;
+  max-height: 500px;
 }
 
 .form-control-lg, .form-select-lg {
   border-radius: 5px;
 }
 
+/* Adjusted Task Title and Assign to User */
+.form-group.row .form-control,
+.form-group.row .form-select {
+  max-width: 48%; /* Ensure both have the same width */
+  display: inline-block;
+  margin-right: 2%; /* Adjust spacing */
+}
+
+.form-control-lg,
+.form-select-lg {
+  font-size: 1rem;
+  padding: 8px 12px;
+}
+
+.form-control, .form-select {
+  border-radius: 5px;
+  padding: 8px 12px;
+}
+
+/* Adjust Space between Description and Related */
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+/* Improved Selectors Design */
+.pretty-select,
+.form-control,
+.form-select {
+  width: 100%; /* Full width */
+  padding: 8px 12px;
+  font-size: 1rem; /* Adjusted font size for better readability */
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pretty-select:hover,
+.form-control:hover,
+.form-select:hover {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.pretty-select:focus,
+.form-control:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+}
+
+/* Reduced Button Size */
 .btn-lg {
-  font-size: 1.25rem;
-  padding: 10px 20px;
+  font-size: 1rem; /* Smaller font size */
+  padding: 8px 16px; /* Reduced padding */
 }
 
 .btn-primary {
@@ -31,26 +85,4 @@
 
 .container {
   max-width: 900px;
-}
-
-/* Small and Pretty Select */
-.pretty-select {
-  width: 150px; /* Small width */
-  padding: 5px 10px;
-  font-size: 0.875rem; /* Small font size */
-  border-radius: 5px;
-  background-color: #f8f9fa; /* Light grey background */
-  border: 1px solid #ced4da; /* Subtle border */
-  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-}
-
-.pretty-select:hover {
-  border-color: #007bff; /* Blue border on hover */
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3); /* Light blue shadow on hover */
-}
-
-.pretty-select:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5); /* Stronger blue shadow on focus */
 }

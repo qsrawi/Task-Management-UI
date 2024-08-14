@@ -20,7 +20,6 @@ export class TaskListComponent implements OnInit {
   searchTerm: string = '';
   userRole: string | null = '';
   userId: number = 0;
-  users: string[] = ['John Doe', 'Jane Smith', 'Alice Johnson', 'Bob Lee'];
   isAll: boolean = false
   isHovering: boolean = false; 
 
@@ -89,17 +88,4 @@ export class TaskListComponent implements OnInit {
     this.isAll = isAll;
     this.loadTasks(this.userId);
   }
-
-  // changeUser(task: TaskDto, newUserName: string): void {
-  //   task.assignedToUserName = newUserName;
-  //   console.log('User changed:', task);
-  // }
-
-  // onDropListEnter(): void {
-  //   this.isHovering = true;
-  // }
-
-  // onDropListExit(): void {
-  //   this.isHovering = false;
-  // }
 }

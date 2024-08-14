@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { Observable, of } from 'rxjs';
 import { CreateTaskNoteDto, TaskDto, TaskNoteDto } from '../../models/task';
@@ -10,6 +10,7 @@ import { AdminService } from '../../services/admin.service';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskLogsComponent } from '../task-logs/task-logs.component';
+import { TaskConfig } from '../../models/task-config';
 
 @Component({
   selector: 'app-task-details',
@@ -32,6 +33,13 @@ export class TaskDetailsComponent implements OnInit {
   userRole: string | null = "";
   selectedUserId: number = 0;
   isEditable: boolean = true;
+  quillConfig = TaskConfig.quillConfig;
+  projectOptions = TaskConfig.projectOptions;
+  companyOptions = TaskConfig.companyOptions;
+  personalOptions = TaskConfig.personalOptions;
+  
+
+  relatedNameOptions: string[] = [];
 
   constructor(
     private router: Router,
@@ -46,31 +54,46 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log("task", this.task)
     this.userId = localStorage.getItem('userId');
     this.userRole = localStorage.getItem('userRole');
     const isAllTasks = localStorage.getItem('isAllTasks');
-
+  
     if(this.userRole === "Admin" || isAllTasks === "true" || this.task?.isClosed == true)
       this.isEditable = false;
+  
+    const formattedStartDate = this.formatDate(this.task?.startDate);
+    const formattedDeadLine = this.formatDate(this.task?.deadLine);
 
     this.taskForm = this.fb.group({
-      title: [this.task?.title || ''],
-      description: [this.task?.description || ''],
+      title: [{ value: this.task?.title || '', disabled: !this.isEditing }],
+      description: [{ value: this.task?.description || '', disabled: !this.isEditing }],
       assignedToUserId: [this.task?.assignedToUserId || ''],
+      relatedTo: [{ value: this.task?.relatedTo || '', disabled: !this.isEditing }],
+      relatedName: [{ value: this.task?.relatedName || '', disabled: !this.isEditing }],
+      startDate: [{ value: formattedStartDate || '', disabled: !this.isEditing }],
+      deadLine: [{ value: formattedDeadLine || '', disabled: !this.isEditing }],
       newNote: ['']
     });
 
+  
     this.fetchNotes(this.task?.id);
-
+  
     if(this.userRole === "User"){
       this.fetchUsers();
-
+  
       this.taskForm.get('assignedToUserId')?.valueChanges.subscribe(userId => {
         if (userId && !this.taskForm.get('assignedToUserId')?.disabled) {
           this.reassignTask(userId);
           this.taskForm.get('assignedToUserId')?.disable();
         }
       });
+    }
+  
+    // Initialize relatedNameOptions based on the existing relatedTo value
+    const relatedTo = this.taskForm.get('relatedTo')?.value;
+    if (relatedTo) {
+      this.updateRelatedNameOptions(relatedTo);
     }
   }
 
@@ -95,19 +118,31 @@ export class TaskDetailsComponent implements OnInit {
 
   onEdit(): void {
     this.isEditing = true;
+    this.taskForm.get('relatedTo')?.enable();
+    this.taskForm.get('relatedName')?.enable();
+    this.taskForm.get('startDate')?.enable();
+    this.taskForm.get('deadLine')?.enable();
+    this.taskForm.get('description')?.enable();
+    this.taskForm.get('title')?.enable();
   }
 
   onSave(): void {
     if (!this.isEditing) return;
+    
     const updatedTask: TaskDto = {
       id: this.task.id,
       title: this.taskForm.get('title')?.value,
       description: this.taskForm.get('description')?.value,
-      assignedToUserId: this.task.assignedToUserId,
+      assignedToUserId: this.taskForm.get('assignedToUserId')?.value,
       assignedToUserName: this.task.assignedToUserName,
       createdAt: this.task.createdAt,
       isClosed: this.task.isClosed,
-      creatorUserId: Number(this.userId)
+      createdBy: this.task.createdBy,
+      creatorUserId: Number(this.userId),
+      relatedTo: this.taskForm.get('relatedTo')?.value,
+      relatedName: this.taskForm.get('relatedName')?.value,
+      startDate: this.taskForm.get('startDate')?.value,
+      deadLine: this.taskForm.get('deadLine')?.value
     };
 
     this.userService.updateTask(updatedTask).subscribe(
@@ -115,6 +150,11 @@ export class TaskDetailsComponent implements OnInit {
         this.task = updatedTask;
         this.isEditing = false;
         this.toastr.success('Task updated successfully', 'Success');
+        this.taskForm.get('relatedTo')?.disable();
+        this.taskForm.get('relatedName')?.disable();
+        this.taskForm.get('startDate')?.disable();
+        this.taskForm.get('deadLine')?.disable();
+        this.taskForm.get('description')?.disable(); 
       },
       () => {
         this.toastr.error('Error updating task', 'Error');
@@ -190,5 +230,38 @@ export class TaskDetailsComponent implements OnInit {
 
   refreshLogs(): void {
     this.taskLogsComponent.fetchLogs(this.task.id); // Call the fetchLogs method from TaskLogsComponent
+  }
+
+  onRelatedToChange(event: Event): void {
+    const relatedTo = (event.target as HTMLSelectElement).value;
+    this.updateRelatedNameOptions(relatedTo);
+  
+    // Reset the relatedName field if the relatedTo field changes
+    this.taskForm.get('relatedName')?.setValue('');
+  }
+  
+  updateRelatedNameOptions(relatedTo: string): void {
+    switch (relatedTo) {
+      case 'Project':
+        this.relatedNameOptions = this.projectOptions;
+        break;
+      case 'Company':
+        this.relatedNameOptions = this.companyOptions;
+        break;
+      case 'Personal':
+        this.relatedNameOptions = this.personalOptions;
+        break;
+      default:
+        this.relatedNameOptions = [];
+    }
+  }
+
+  formatDate(date: any): string {
+    if (!date) return '';
+    const d = new Date(date);
+    const month = `0${d.getMonth() + 1}`.slice(-2);
+    const day = `0${d.getDate()}`.slice(-2);
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
   }
 }

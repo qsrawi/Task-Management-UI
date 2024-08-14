@@ -1,90 +1,86 @@
 <app-header-nav (tabChange)="handleTabChange($event)"></app-header-nav>
 <div class="container mt-4">
-    <!-- Search Bar -->
-    <div class="row mb-3">
-        <div class="col">
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Search Task..." [(ngModel)]="searchTerm">
-                <span class="input-group-text">
-                    <i class="fa fa-search"></i>
-                </span>
-            </div>
+  <!-- Search Bar -->
+  <div class="row mb-3">
+    <div class="col">
+      <div class="input-group">
+        <input type="text" class="form-control form-control-sm search-bar" placeholder="Search Task..." [(ngModel)]="searchTerm">
+        <span class="input-group-text search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" cdkDropListGroup>
+    <!-- In-Progress Section -->
+    <div class="col-md-6" *ngIf="inProgressTasks$ | async as inProgressTasks">
+      <div class="in-progress-section">
+        <div class="card bg-primary text-white mb-3">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fa fa-hourglass-half"></i> In-Progress <span class="badge bg-light text-primary">{{ inProgressTasks.length }}</span>
+            </h5>
+          </div>
         </div>
+        <div class="row" cdkDropList [cdkDropListData]="inProgressTasks" (cdkDropListDropped)="drop($event)">
+          <div class="col-md-6 mb-3" *ngFor="let task of filteredTasks(inProgressTasks)">
+            <div cdkDrag [cdkDragData]="task.id" [cdkDragDisabled]="isAll">
+              <div class="card task-card mb-3" (click)="onTaskClick(task)">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                  <div>
+                    <h6 class="card-title">{{ task.title }}</h6>
+                    <p class="card-text">
+                      <strong>Assigned To:</strong> {{ task.assignedToUserName }}<br>
+                      <strong>Created By:</strong> {{ task.createdBy }}<br>
+                      <small class="text-muted">{{ task.createdAt | date: 'dd-MMM-yyyy' }}</small>
+                    </p>
+                  </div>
+                  <div class="task-icons">
+                    <i class="fa fa-sticky-note"></i> {{ task.notesCount }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="row" cdkDropListGroup>
-        <div class="col-md-6" *ngIf="inProgressTasks$ | async as inProgressTasks">
-            <div class="in-progress-section">
-                <div class="card bg-primary text-white mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <i class="fa fa-hourglass-half"></i> In-Progress <span class="badge bg-light text-primary">{{ inProgressTasks.length }}</span>
-                        </h5>
-                    </div>
-                </div>
-                <div
-                    class="row" 
-                    cdkDropList 
-                    [cdkDropListData]="inProgressTasks" 
-                    (cdkDropListDropped)="drop($event)">
-                    <div class="col-md-6 mb-3" *ngFor="let task of filteredTasks(inProgressTasks)">
-                        <div cdkDrag [cdkDragData]="task.id" [cdkDragDisabled]="isAll">
-                            <div class="card task-card mb-3" (click)="onTaskClick(task)">
-                                <div class="card-body d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h5 class="card-title">{{ task.title }}</h5>
-                                        <p class="card-text">
-                                            <strong>Assigned to:</strong> {{ task.assignedToUserName }}
-                                            <br>
-                                            <small class="text-muted">{{ task.createdAt | date: 'dd-MMM-yyyy' }}</small>
-                                        </p>
-                                    </div>
-                                    <div class="task-icons">
-                                        <i class="fa fa-sticky-note"></i> {{ task.notesCount }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Completed Section -->
+    <div *ngIf="completedTasks$ | async as completedTasks" class="col-md-6 completed-section">
+      <div class="card bg-success text-white mb-3">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fa fa-check-circle"></i> Completed <span class="badge bg-light text-success">{{ completedTasks.length }}</span>
+          </h5>
         </div>
-
-        <!-- Completed Section -->
-        <div 
-            *ngIf="completedTasks$ | async as completedTasks"
-            class="col-md-6 completed-section" >
-            <div class="card bg-success text-white mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="fa fa-check-circle"></i>  Completed <span class="badge bg-light text-success">{{ completedTasks.length }}</span>
-                    </h5>
+      </div>
+      <div class="row" cdkDropList [cdkDropListData]="completedTasks" (cdkDropListDropped)="drop($event)">
+        <div class="col-md-6 mb-3" *ngFor="let task of filteredTasks(completedTasks)">
+          <div>
+            <div class="card task-card mb-3" (click)="onTaskClick(task)">
+              <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                  <h6 class="card-title">{{ task.title }}</h6>
+                  <p class="card-text">
+                    <strong>Assigned to:</strong> {{ task.assignedToUserName }}<br>
+                    <strong>Created By:</strong> {{ task.createdBy }}<br>
+                    <small class="text-muted">{{ task.createdAt | date: 'dd-MMM-yyyy' }}</small>
+                  </p>
                 </div>
-            </div>
-            <div class="row"   
-            cdkDropList 
-            [cdkDropListData]="completedTasks" 
-            (cdkDropListDropped)="drop($event)">
-                <div class="col-md-6 mb-3" *ngFor="let task of filteredTasks(completedTasks)">
-                    <div>
-                        <div class="card task-card mb-3" (click)="onTaskClick(task)">
-                            <div class="card-body d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h5 class="card-title">{{ task.title }}</h5>
-                                    <p class="card-text">
-                                        <strong>Assigned to:</strong> {{ task.assignedToUserName }}
-                                        <br>
-                                        <small class="text-muted">{{ task.createdAt | date: 'dd-MMM-yyyy' }}</small>
-                                    </p>
-                                </div>
-                                <div class="task-icons">
-                                    <i class="fa fa-sticky-note"></i> {{ task.notesCount }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="task-icons">
+                  <i class="fa fa-sticky-note"></i> {{ task.notesCount }}
                 </div>
+              </div>
             </div>
+          </div>
         </div>
+        <!-- Placeholder to allow drag-and-drop into an empty list -->
+        <div *ngIf="filteredTasks(completedTasks).length === 0" class="col-12">
+          <div class="card task-card mb-3" style="height: 50px; visibility: hidden;"></div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
