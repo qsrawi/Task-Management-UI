@@ -1,7 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+
 .container {
     width: 100%;
     height: 100vh;
-    background-color: #2acbaa;
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+    padding: 0.01rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,7 +18,7 @@
   }
 
   .card-header {
-    background-color: #2acbaa;
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
     padding: 10px;
   }
   
@@ -22,21 +26,29 @@
     margin: 0;
     color: white;
     font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
   }
   
   .input-group-text {
-    background-color: #2acbaa;
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
     color: white;
   }
   
   .btn-primary {
-    background-color: #2acbaa;
-    border-color: #2acbaa;
+    background-color: linear-gradient(45deg, #6a11cb, #2575fc);
+    border-color: #2575fc;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 10px;
+    transition: background-color 0.3s, transform 0.3s;
   }
   
   .btn-primary:hover {
-    background-color: #249a87;
-    border-color: #249a87;
+    background-color: #2575fc;
+    transform: scale(1.05);
   }
   
   .text-danger {
@@ -49,7 +61,7 @@
   }
   
   .signup a {
-    color: #2acbaa;
+    color: linear-gradient(45deg, #6a11cb, #2575fc);
     text-decoration: none;
   }
   

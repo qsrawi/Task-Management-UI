@@ -6,17 +6,17 @@
           <span *ngIf="log.action === 'Update'">
             Update {{ log.fieldName }}
             <ng-container *ngIf="log.fieldName !== 'Description'">
-              to "{{ log.value }}"
+              "{{ log.value }}"
             </ng-container>
           </span>
-          <span *ngIf="log.action === 'Assigned'">Assigned to {{ log.value }}</span>
+          <span *ngIf="log.action === 'Assign'">Assigned to {{ log.value }}</span>
         </div>
         <div class="line"></div>
       </div>
       <div class="info">
         <div *ngIf="log.action === 'Create'" class="box">New</div>
         <div *ngIf="log.action === 'Update'" class="box">Update</div>
-        <div *ngIf="log.action === 'Assigned'" class="box">Assigned</div>
+        <div *ngIf="log.action === 'Assign'" class="box">Assign</div>
         <div class="user">{{ log.modifierUser }}</div>
         <div class="date">{{ log.date | date: 'short' }}</div>
       </div>

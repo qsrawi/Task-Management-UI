@@ -138,7 +138,7 @@ export class TaskDetailsComponent implements OnInit {
       createdAt: this.task.createdAt,
       isClosed: this.task.isClosed,
       createdBy: this.task.createdBy,
-      creatorUserId: Number(this.userId),
+      creatorUserId: this.task.creatorUserId,
       relatedTo: this.taskForm.get('relatedTo')?.value,
       relatedName: this.taskForm.get('relatedName')?.value,
       startDate: this.taskForm.get('startDate')?.value,
