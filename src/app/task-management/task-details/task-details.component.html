@@ -54,10 +54,10 @@
                 </select>
               </div>
               <div class="col-md-6 mb-3">
-                <label for="relatedName" class="form-label">Related Name</label>
-                <select id="relatedName" class="form-select form-select-sm" formControlName="relatedName" [disabled]="!isEditing">
+                <label for="relatedToId" class="form-label">Related Name</label>
+                <select id="relatedToId" class="form-select form-select-sm" formControlName="relatedToId" [disabled]="!isEditing">
                   <option value="" disabled>Select related name</option>
-                  <option *ngFor="let option of relatedNameOptions" [value]="option">{{ option }}</option>
+                  <option *ngFor="let option of relatedNameOptions" [value]="option.id">{{ option.name }}</option>
                 </select>
               </div>
             </div>

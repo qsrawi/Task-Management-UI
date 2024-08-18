@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { CreateTaskNoteDto, TaskDto, TaskLogsDto, TaskNoteDto } from '../models/task';
 import { HttpClient } from '@angular/common/http';
 import { UserDto } from '../models/login-user-dto';
+import { RelatedDto } from '../models/related-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +46,21 @@ export class UserService {
     return this.http.post<void>(`${this.userApiUrl}/AssignTask/${taskId}/${userId}`, {});
   }
 
+  getRelated(): Observable<{ [key: string]: Array<{ id: number, name: string }> }> {
+    return this.http.get<RelatedDto[]>(`${this.userApiUrl}/GetRelated`).pipe(
+      map((data: RelatedDto[]) => {
+        return data.reduce((acc, current) => {
+          const category = current.categoryName;
+          if (!acc[category]) {
+            acc[category] = [];
+          }
+          acc[category].push({ id: current.id, name: current.name });
+          return acc;
+        }, {} as { [key: string]: Array<{ id: number, name: string }> });
+      })
+    );
+  }
+  
   closeTask(taskId: number): Observable<void> {
     return this.http.post<void>(`${this.userApiUrl}/CloseTask/${taskId}`, {});
   }

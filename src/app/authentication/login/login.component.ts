@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { decodeToken } from '../../helper/jwt-decode';
 
 @Component({
   selector: 'app-login',
@@ -19,12 +18,10 @@ export class LoginComponent {
     this.loginError = '';
 
     this.authService.login(this.loginData).subscribe(
-      (response: any) => {
-        localStorage.setItem('authToken', response.token);
-        localStorage.setItem('userId', response.id);
-        localStorage.setItem('userRole', response.role);
+      (token: string) => {
+        localStorage.setItem('authToken', token);
         localStorage.setItem("isAllTasks", "false");
-        this.router.navigate([`/${response.role.toLowerCase()}/task-list`, response.id]);
+        this.router.navigate([`/${decodeToken('Role').toLowerCase()}/task-list`]);
       },
       (error) => {
         this.loginError = 'Login failed. Please check your user name and password.';

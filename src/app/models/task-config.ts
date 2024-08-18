@@ -10,7 +10,7 @@ export class TaskConfig {
       ]
     };
   
-    static projectOptions = ['ERP', 'HIS', 'RFID', 'Insurance Broker'];
-    static companyOptions = ['شركة الهدى للمحروقات', 'شركة التامين الوطنية', 'مستشفى الاستشاري', 'البنك العربي'];
-    static personalOptions = ['.net core', 'Angular', 'Flutter'];
+    // static projectOptions = ['ERP', 'HIS', 'RFID', 'Insurance Broker'];
+    // static companyOptions = ['شركة الهدى للمحروقات', 'شركة التامين الوطنية', 'مستشفى الاستشاري', 'البنك العربي'];
+    // static personalOptions = ['.net core', 'Angular', 'Flutter'];
 }

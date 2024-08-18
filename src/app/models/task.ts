@@ -8,8 +8,9 @@ export interface TaskDto {
   isClosed: boolean;
   creatorUserId?: number;
   notesCount?: number;
-  relatedTo: string;
-  relatedName: string;
+  relatedToId: number;
+  relatedTo?: number;
+  relatedName?: string;
   createdBy: string;
   startDate: Date;
   deadLine: Date;
@@ -20,8 +21,7 @@ export interface CreateTaskDto {
   title: string;
   description: string;
   assignedToUserId: number;
-  relatedTo: string;
-  relatedName: string;
+  relatedToId: string;
   createdBy: string;
   startDate: Date;
   deadLine: Date;

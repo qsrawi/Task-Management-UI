@@ -40,10 +40,10 @@
                 </select>
               </div>
               <div class="col-md-6">
-                <label for="relatedName" class="form-label">Related Name</label>
-                <select id="relatedName" class="form-select pretty-select" formControlName="relatedName" required>
+                <label for="relatedToId" class="form-label">Related Name</label>
+                <select id="relatedToId" class="form-select pretty-select" formControlName="relatedToId" required>
                   <option value="" disabled>Select related name</option>
-                  <option *ngFor="let option of relatedNameOptions" [value]="option">{{ option }}</option>
+                  <option *ngFor="let option of relatedNameOptions" [value]="option.id">{{ option.name }}</option>
                 </select>
               </div>
             </div>

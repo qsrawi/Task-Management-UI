@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
+import { decodeToken } from '../../helper/jwt-decode';
 
 @Component({
   selector: 'app-header-nav',
@@ -12,7 +13,7 @@ export class HeaderNavComponent {
   userRole: string | null = "";
 
   constructor(private router: Router){
-    this.userRole = localStorage.getItem("userRole");
+    this.userRole = decodeToken('Role');
   }
 
   onTabClick(isAll: boolean) {

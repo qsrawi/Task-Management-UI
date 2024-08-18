@@ -7,10 +7,11 @@ import { CreateTaskNoteDto, TaskDto, TaskNoteDto } from '../../models/task';
 import { ToastrService } from 'ngx-toastr';
 import { UserDto } from '../../models/login-user-dto';
 import { AdminService } from '../../services/admin.service';
-import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent } from '../../helper/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskLogsComponent } from '../task-logs/task-logs.component';
 import { TaskConfig } from '../../models/task-config';
+import { decodeToken } from '../../helper/jwt-decode';
 
 @Component({
   selector: 'app-task-details',
@@ -34,12 +35,9 @@ export class TaskDetailsComponent implements OnInit {
   selectedUserId: number = 0;
   isEditable: boolean = true;
   quillConfig = TaskConfig.quillConfig;
-  projectOptions = TaskConfig.projectOptions;
-  companyOptions = TaskConfig.companyOptions;
-  personalOptions = TaskConfig.personalOptions;
   
-
-  relatedNameOptions: string[] = [];
+  relatedNameOptions: Array<{ id: number, name: string }> = [];
+  relatedOptionsByCategory: { [key: string]: Array<{ id: number, name: string }> } = {};
 
   constructor(
     private router: Router,
@@ -54,9 +52,8 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log("task", this.task)
-    this.userId = localStorage.getItem('userId');
-    this.userRole = localStorage.getItem('userRole');
+    this.userId = decodeToken('Id');
+    this.userRole = decodeToken('Role');
     const isAllTasks = localStorage.getItem('isAllTasks');
   
     if(this.userRole === "Admin" || isAllTasks === "true" || this.task?.isClosed == true)
@@ -70,14 +67,14 @@ export class TaskDetailsComponent implements OnInit {
       description: [{ value: this.task?.description || '', disabled: !this.isEditing }],
       assignedToUserId: [this.task?.assignedToUserId || ''],
       relatedTo: [{ value: this.task?.relatedTo || '', disabled: !this.isEditing }],
-      relatedName: [{ value: this.task?.relatedName || '', disabled: !this.isEditing }],
+      relatedToId: [{ value: this.task?.relatedToId || '', disabled: !this.isEditing }],
       startDate: [{ value: formattedStartDate || '', disabled: !this.isEditing }],
       deadLine: [{ value: formattedDeadLine || '', disabled: !this.isEditing }],
       newNote: ['']
     });
 
-  
     this.fetchNotes(this.task?.id);
+    this.fetchRelated();
   
     if(this.userRole === "User"){
       this.fetchUsers();
@@ -89,11 +86,6 @@ export class TaskDetailsComponent implements OnInit {
         }
       });
     }
-  
-    const relatedTo = this.taskForm.get('relatedTo')?.value;
-    if (relatedTo) {
-      this.updateRelatedNameOptions(relatedTo);
-    }
   }
 
   fetchNotes(taskId: number): void {
@@ -104,10 +96,22 @@ export class TaskDetailsComponent implements OnInit {
     this.users$ = this.userService.getUsers();
   }
 
+  fetchRelated(): void {
+    this.userRole === "User" 
+    ? this.userService.getRelated().subscribe((data) => {
+      this.relatedOptionsByCategory = data;
+      this.updateRelatedNameOptions(this.taskForm.get('relatedTo')?.value);
+    })
+    : this.adminService.getRelated().subscribe((data) => {
+      this.relatedOptionsByCategory = data;
+      this.updateRelatedNameOptions(this.taskForm.get('relatedTo')?.value);
+    })
+  }
+
   reassignTask(userId: string): void {
     this.userService.assignTask(this.task.id, userId).subscribe(
       () => {
-        this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`, this.userId]);
+        this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`]);
         this.toastr.success('Task reassigned successfully', 'Success');
       },
       () => {
@@ -119,7 +123,7 @@ export class TaskDetailsComponent implements OnInit {
   onEdit(): void {
     this.isEditing = true;
     this.taskForm.get('relatedTo')?.enable();
-    this.taskForm.get('relatedName')?.enable();
+    this.taskForm.get('relatedToId')?.enable();
     this.taskForm.get('startDate')?.enable();
     this.taskForm.get('deadLine')?.enable();
     this.taskForm.get('description')?.enable();
@@ -139,8 +143,7 @@ export class TaskDetailsComponent implements OnInit {
       isClosed: this.task.isClosed,
       createdBy: this.task.createdBy,
       creatorUserId: this.task.creatorUserId,
-      relatedTo: this.taskForm.get('relatedTo')?.value,
-      relatedName: this.taskForm.get('relatedName')?.value,
+      relatedToId: this.taskForm.get('relatedToId')?.value,
       startDate: this.taskForm.get('startDate')?.value,
       deadLine: this.taskForm.get('deadLine')?.value
     };
@@ -151,7 +154,7 @@ export class TaskDetailsComponent implements OnInit {
         this.isEditing = false;
         this.toastr.success('Task updated successfully', 'Success');
         this.taskForm.get('relatedTo')?.disable();
-        this.taskForm.get('relatedName')?.disable();
+        this.taskForm.get('relatedToId')?.disable();
         this.taskForm.get('startDate')?.disable();
         this.taskForm.get('deadLine')?.disable();
         this.taskForm.get('description')?.disable(); 
@@ -165,7 +168,7 @@ export class TaskDetailsComponent implements OnInit {
   onCancel(): void {
     localStorage.setItem("isAllTasks", "false");
     this.isEditing = false;
-    this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`, this.userId]);
+    this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`]);
   }
 
   addNote(): void {
@@ -216,7 +219,7 @@ export class TaskDetailsComponent implements OnInit {
       if (result) {
         this.adminService.deleteTask(this.task.id).subscribe(() => {
           this.toastr.success('Task deleted successfully', 'Success');
-          this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`, this.userId]);
+          this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`]);
         });
       } else {
         this.toastr.error('Task deletion was canceled', 'Error');
@@ -236,23 +239,11 @@ export class TaskDetailsComponent implements OnInit {
     const relatedTo = (event.target as HTMLSelectElement).value;
     this.updateRelatedNameOptions(relatedTo);
   
-    this.taskForm.get('relatedName')?.setValue('');
+    this.taskForm.get('relatedToId')?.setValue('');
   }
-  
+
   updateRelatedNameOptions(relatedTo: string): void {
-    switch (relatedTo) {
-      case 'Project':
-        this.relatedNameOptions = this.projectOptions;
-        break;
-      case 'Company':
-        this.relatedNameOptions = this.companyOptions;
-        break;
-      case 'Personal':
-        this.relatedNameOptions = this.personalOptions;
-        break;
-      default:
-        this.relatedNameOptions = [];
-    }
+    this.relatedNameOptions = this.relatedOptionsByCategory[relatedTo] || [];
   }
 
   formatDate(date: any): string {

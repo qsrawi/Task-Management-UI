@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { CreateTaskDto, CreateTaskNoteDto, TaskDto, TaskLogsDto, TaskNoteDto } from '../models/task';
 import { HttpClient } from '@angular/common/http';
 import { UserDto } from '../models/login-user-dto';
+import { RelatedDto } from '../models/related-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
-  getAllTasks(userId: number): Observable<TaskDto[]> {
+  getAllTasks(): Observable<TaskDto[]> {
     return this.http.get<TaskDto[]>(`${this.adminApiUrl}/GetAllTasks`);
   }
 
@@ -27,6 +28,21 @@ export class AdminService {
 
   getUsers(): Observable<UserDto[]> {
     return this.http.get<UserDto[]>(`${this.adminApiUrl}/GetUsers`);
+  }
+
+  getRelated(): Observable<{ [key: string]: Array<{ id: number, name: string }> }> {
+    return this.http.get<RelatedDto[]>(`${this.adminApiUrl}/GetRelated`).pipe(
+      map((data: RelatedDto[]) => {
+        return data.reduce((acc, current) => {
+          const category = current.categoryName;
+          if (!acc[category]) {
+            acc[category] = [];
+          }
+          acc[category].push({ id: current.id, name: current.name });
+          return acc;
+        }, {} as { [key: string]: Array<{ id: number, name: string }> });
+      })
+    );
   }
 
   getNotesByTask(taskId: number): Observable<TaskNoteDto[]> {

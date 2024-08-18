@@ -6,6 +6,7 @@ import { Observable, of } from 'rxjs';
 import { UserDto } from '../../models/login-user-dto';
 import { ToastrService } from 'ngx-toastr';
 import { TaskConfig } from '../../models/task-config';
+import { decodeToken } from '../../helper/jwt-decode';
 
 @Component({
   selector: 'app-add-task',
@@ -18,11 +19,9 @@ export class AddTaskComponent implements OnInit {
   addTaskForm: FormGroup;
   userId: string | null = "";
   userName: string | null = "";
-  relatedNameOptions: string[] = [];
   quillConfig = TaskConfig.quillConfig;
-  projectOptions = TaskConfig.projectOptions;
-  companyOptions = TaskConfig.companyOptions;
-  personalOptions = TaskConfig.personalOptions;
+  relatedNameOptions: Array<{ id: number, name: string }> = [];
+  relatedOptionsByCategory: { [key: string]: Array<{ id: number, name: string }> } = {};
 
   constructor(
     private fb: FormBuilder,
@@ -36,14 +35,17 @@ export class AddTaskComponent implements OnInit {
       description: ['', Validators.required],
       assignedToUserId: ['', Validators.required],
       relatedTo: ['', Validators.required],
-      relatedName: ['', Validators.required],
+      relatedToId: ['', Validators.required],
       startDate: ['', Validators.required],
       deadLine: ['', Validators.required]
     });
   }
 
   ngOnInit(): void {
-    this.userId = localStorage.getItem('userId');
+    this.userId = decodeToken('Id');
+    this.adminService.getRelated().subscribe((data) => {
+      this.relatedOptionsByCategory = data;
+    });
   }
 
   onSubmit(): void {
@@ -52,31 +54,26 @@ export class AddTaskComponent implements OnInit {
         ...this.addTaskForm.value,
         creatorUserId: this.userId
       };
+
       this.adminService.createTask(newTask).subscribe(() => {
         this.toastr.success('Task deleted successfully', 'Success');
-        this.router.navigate(['/admin/task-list', this.userId]);
+        this.router.navigate(['/admin/task-list']);
       });
     }
   }
 
   onRelatedToChange(event: Event): void {
-    const selectedValue = (event.target as HTMLSelectElement).value;
-    switch (selectedValue) {
-      case 'Project':
-        this.relatedNameOptions = this.projectOptions;
-        break;
-      case 'Company':
-        this.relatedNameOptions = this.companyOptions;
-        break;
-      case 'Personal':
-        this.relatedNameOptions = this.personalOptions;
-        break;
-      default:
-        this.relatedNameOptions = [];
-    }
+    const relatedTo = (event.target as HTMLSelectElement).value;
+    this.updateRelatedNameOptions(relatedTo);
+  
+    this.addTaskForm.get('relatedToId')?.setValue('');
+  }
+
+  updateRelatedNameOptions(relatedTo: string): void {
+    this.relatedNameOptions = this.relatedOptionsByCategory[relatedTo] || [];
   }
 
   onCancel(): void {
-    this.router.navigate(['/admin/task-list', this.userId]);
+    this.router.navigate(['/admin/task-list']);
   }
 }

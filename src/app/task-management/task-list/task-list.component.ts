@@ -1,4 +1,4 @@
-import { CdkDragDrop, transferArrayItem, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { delay, map, Observable, of, tap } from 'rxjs';
 import { TaskDto } from '../../models/task';
@@ -6,6 +6,7 @@ import { UserService } from '../../services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { ToastrService } from 'ngx-toastr';
+import { decodeToken } from '../../helper/jwt-decode';
 
 @Component({
   selector: 'app-task-list',
@@ -21,19 +22,17 @@ export class TaskListComponent implements OnInit {
   userRole: string | null = '';
   userId: number = 0;
   isAll: boolean = false
-  isHovering: boolean = false; 
 
   constructor(
     private userService: UserService,
     private adminService: AdminService,
     private toastr: ToastrService,
-    private router: Router,
-    private route: ActivatedRoute
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.userId = Number(this.route.snapshot.paramMap.get('id'));
-    this.userRole = localStorage.getItem('userRole');
+    this.userId = Number(decodeToken('Id'));
+    this.userRole = decodeToken('Role');
     this.loadTasks(this.userId); 
   }
 
@@ -70,7 +69,7 @@ export class TaskListComponent implements OnInit {
 
   loadTasks(userId: number): void {
     if (this.userRole == "Admin")
-      this.tasks$ = this.adminService.getAllTasks(userId);
+      this.tasks$ = this.adminService.getAllTasks();
     else if (!this.isAll)
       this.tasks$ = this.userService.getAllTasksByUser(userId);
     else
