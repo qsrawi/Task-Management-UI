@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -13,18 +14,14 @@ export class RegisterComponent {
   registerData = { userName: '', email: '', password: '' };
   registrationError: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private toastr: ToastrService,) {}
 
   onSubmit() {
     this.registrationError = '';
 
     this.authService.register(this.registerData).subscribe(
-      (response: any) => {
-        localStorage.setItem('authToken', response.token);
-        localStorage.setItem('userName', response.userName);
-        localStorage.setItem('userId', response.id);
-        localStorage.setItem('userRole', response.role);
-        localStorage.setItem("isAllTasks", "false");
+      () => {
+        this.toastr.success('User Registered successfully', 'Success');
         this.router.navigate(['/auth/login']);
       },
       (error) => {

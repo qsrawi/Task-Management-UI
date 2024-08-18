@@ -44,15 +44,13 @@ export class AddTaskComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = localStorage.getItem('userId');
-    this.userName = localStorage.getItem('userName');
   }
 
   onSubmit(): void {
     if (this.addTaskForm.valid) {
       const newTask = {
         ...this.addTaskForm.value,
-        creatorUserId: this.userId,
-        createdBy: this.userName
+        creatorUserId: this.userId
       };
       this.adminService.createTask(newTask).subscribe(() => {
         this.toastr.success('Task deleted successfully', 'Success');

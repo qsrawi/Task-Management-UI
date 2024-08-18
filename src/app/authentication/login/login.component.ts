@@ -21,7 +21,6 @@ export class LoginComponent {
     this.authService.login(this.loginData).subscribe(
       (response: any) => {
         localStorage.setItem('authToken', response.token);
-        localStorage.setItem('userName', response.userName);
         localStorage.setItem('userId', response.id);
         localStorage.setItem('userRole', response.role);
         localStorage.setItem("isAllTasks", "false");
