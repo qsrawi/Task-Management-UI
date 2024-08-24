@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreateTaskNoteDto, TaskDto, TaskLogsDto, TaskNoteDto } from '../models/task';
+import { CreateTaskNoteDto, TaskDto, TaskLogsDto, TaskNoteDto, TaskResponse } from '../models/task';
 import { HttpClient } from '@angular/common/http';
 import { UserDto } from '../models/login-user-dto';
 import { SharedService } from './shared.service';
@@ -14,12 +14,12 @@ export class UserService {
 
   constructor(private http: HttpClient, private sharedService: SharedService) {}
 
-  getAllTasksByUser(): Observable<TaskDto[]> {
-    return this.http.get<TaskDto[]>(`${this.userApiUrl}/GetAllTasksByUser`);
+  getAllTasksByUser(): Observable<TaskResponse> {
+    return this.http.get<TaskResponse>(`${this.userApiUrl}/GetAllTasksByUser`);
   }
 
-  getAllTasksWithoutUserId(): Observable<TaskDto[]> {
-    return this.http.get<TaskDto[]>(`${this.userApiUrl}/GetAllTasksWithoutUserId`);
+  getAllTasksWithoutUserId(): Observable<TaskResponse> {
+    return this.http.get<TaskResponse>(`${this.userApiUrl}/GetAllTasksWithoutUserId`);
   }
 
   getNotesByTask(taskId: number): Observable<TaskNoteDto[]> {

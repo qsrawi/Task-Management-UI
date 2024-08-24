@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreateTaskDto, CreateTaskNoteDto, TaskDto, TaskLogsDto, TaskNoteDto } from '../models/task';
+import { CreateTaskDto, CreateTaskNoteDto, TaskDto, TaskLogsDto, TaskNoteDto, TaskResponse } from '../models/task';
 import { HttpClient } from '@angular/common/http';
 import { UserDto } from '../models/login-user-dto';
 import { SharedService } from './shared.service';
@@ -14,7 +14,7 @@ export class AdminService {
 
   constructor(private http: HttpClient, private sharedService: SharedService) {}
 
-  getAllTasks(): Observable<TaskDto[]> {
+  getAllTasks(): Observable<TaskResponse> {
     return this.sharedService.getAllTasks(`${this.adminEndpoint}/GetAllTasks`);
   }
 

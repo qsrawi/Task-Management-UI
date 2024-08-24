@@ -19,7 +19,6 @@ export class LoginComponent {
 
     this.authService.login(this.loginData).subscribe(
       (response: any) => {
-        console.log(response)
         localStorage.setItem('authToken', response.token);
         localStorage.setItem("isAllTasks", "false");
         this.router.navigate([`/${decodeToken().toLowerCase()}/task-list`]);

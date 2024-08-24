@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { TaskDto, TaskNoteDto, TaskLogsDto, CreateTaskNoteDto } from '../models/task';
+import { TaskDto, TaskNoteDto, TaskLogsDto, CreateTaskNoteDto, TaskResponse } from '../models/task';
 import { UserDto } from '../models/login-user-dto';
 import { RelatedDto } from '../models/related-dto';
 
@@ -14,8 +14,8 @@ export class SharedService {
 
   constructor(private http: HttpClient) {}
 
-  getAllTasks(endpoint: string): Observable<TaskDto[]> {
-    return this.http.get<TaskDto[]>(`${this.apiUrl}/${endpoint}`);
+  getAllTasks(endpoint: string): Observable<TaskResponse> {
+    return this.http.get<TaskResponse>(`${this.apiUrl}/${endpoint}`);
   }
 
   getNotesByTask(endpoint: string, taskId: number): Observable<TaskNoteDto[]> {

@@ -16,6 +16,11 @@ export interface TaskDto {
   deadLine: Date;
 }
 
+export interface TaskResponse {
+  lstData: TaskDto[];
+  rowsCount: number;
+}
+
 export interface CreateTaskDto {
   creatorUserId: number;
   title: string;

@@ -1,7 +1,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { map, Observable, of, tap } from 'rxjs';
-import { TaskDto } from '../../models/task';
+import { TaskDto, TaskResponse } from '../../models/task';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
@@ -14,7 +14,7 @@ import { decodeToken } from '../../helper/jwt-decode';
   styleUrls: ['./task-list.component.css'],
 })
 export class TaskListComponent implements OnInit {
-  tasks$: Observable<TaskDto[]> = of([]);
+  tasks$: Observable<TaskResponse> = of();
   inProgressTasks$: Observable<TaskDto[]> = of([]);
   completedTasks$: Observable<TaskDto[]> = of([]);
 
@@ -74,10 +74,10 @@ export class TaskListComponent implements OnInit {
       this.tasks$ = this.userService.getAllTasksWithoutUserId();
 
     this.inProgressTasks$ = this.tasks$.pipe(
-      map(tasks => tasks.filter(task => !task.isClosed))
+      map(tasks => tasks.lstData.filter(task => !task.isClosed))
     );
     this.completedTasks$ = this.tasks$.pipe(
-      map(tasks => tasks.filter(task => task.isClosed))
+      map(tasks => tasks.lstData.filter(task => task.isClosed))
     );
   }
 
