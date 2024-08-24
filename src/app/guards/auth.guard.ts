@@ -14,7 +14,7 @@ export class AuthGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
 
-    const userRole = decodeToken('Role');
+    const userRole = decodeToken();
     
     if (userRole) {
       const routeRole = next.url[0].path;

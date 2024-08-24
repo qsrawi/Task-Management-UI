@@ -37,7 +37,6 @@ export interface TaskNoteDto {
 }
 
 export interface CreateTaskNoteDto {
-  userId: number;
   taskItemId: number;
   note: string;
 }

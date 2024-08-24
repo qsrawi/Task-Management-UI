@@ -17,7 +17,6 @@ export class AddTaskComponent implements OnInit {
   users$: Observable<UserDto[]> = of([]);
 
   addTaskForm: FormGroup;
-  userId: string | null = "";
   userName: string | null = "";
   quillConfig = TaskConfig.quillConfig;
   relatedNameOptions: Array<{ id: number, name: string }> = [];
@@ -42,7 +41,6 @@ export class AddTaskComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userId = decodeToken('Id');
     this.adminService.getRelated().subscribe((data) => {
       this.relatedOptionsByCategory = data;
     });
@@ -51,8 +49,7 @@ export class AddTaskComponent implements OnInit {
   onSubmit(): void {
     if (this.addTaskForm.valid) {
       const newTask = {
-        ...this.addTaskForm.value,
-        creatorUserId: this.userId
+        ...this.addTaskForm.value
       };
 
       this.adminService.createTask(newTask).subscribe(() => {

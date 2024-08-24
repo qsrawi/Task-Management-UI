@@ -1,9 +1,9 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
-import { delay, map, Observable, of, tap } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 import { TaskDto } from '../../models/task';
 import { UserService } from '../../services/user.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { ToastrService } from 'ngx-toastr';
 import { decodeToken } from '../../helper/jwt-decode';
@@ -20,7 +20,6 @@ export class TaskListComponent implements OnInit {
 
   searchTerm: string = '';
   userRole: string | null = '';
-  userId: number = 0;
   isAll: boolean = false
 
   constructor(
@@ -31,9 +30,8 @@ export class TaskListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.userId = Number(decodeToken('Id'));
-    this.userRole = decodeToken('Role');
-    this.loadTasks(this.userId); 
+    this.userRole = decodeToken();
+    this.loadTasks(); 
   }
 
   filteredTasks(tasks: TaskDto[]): TaskDto[] {
@@ -58,7 +56,7 @@ export class TaskListComponent implements OnInit {
     this.userService.closeTask(taskId).subscribe(
       () => {
         this.toastr.success('Task closed successfully', 'Success');
-        this.loadTasks(this.userId); 
+        this.loadTasks(); 
       },
       error => {
         this.toastr.error('Error closing task', 'Error');
@@ -67,13 +65,13 @@ export class TaskListComponent implements OnInit {
     );
   }
 
-  loadTasks(userId: number): void {
+  loadTasks(): void {
     if (this.userRole == "Admin")
       this.tasks$ = this.adminService.getAllTasks();
     else if (!this.isAll)
-      this.tasks$ = this.userService.getAllTasksByUser(userId);
+      this.tasks$ = this.userService.getAllTasksByUser();
     else
-      this.tasks$ = this.userService.getAllTasksWithoutUserId(userId);
+      this.tasks$ = this.userService.getAllTasksWithoutUserId();
 
     this.inProgressTasks$ = this.tasks$.pipe(
       map(tasks => tasks.filter(task => !task.isClosed))
@@ -85,6 +83,6 @@ export class TaskListComponent implements OnInit {
 
   handleTabChange(isAll: boolean) {
     this.isAll = isAll;
-    this.loadTasks(this.userId);
+    this.loadTasks();
   }
 }

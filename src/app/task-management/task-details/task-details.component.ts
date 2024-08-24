@@ -30,7 +30,6 @@ export class TaskDetailsComponent implements OnInit {
   showAddNoteInput: boolean = false; 
   newNote: string = ''; 
   showLogs: boolean = false;
-  userId: string | null = "";
   userRole: string | null = "";
   selectedUserId: number = 0;
   isEditable: boolean = true;
@@ -52,8 +51,7 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userId = decodeToken('Id');
-    this.userRole = decodeToken('Role');
+    this.userRole = decodeToken();
     const isAllTasks = localStorage.getItem('isAllTasks');
   
     if(this.userRole === "Admin" || isAllTasks === "true" || this.task?.isClosed == true)
@@ -177,7 +175,6 @@ export class TaskDetailsComponent implements OnInit {
     if (newNoteText.trim() === '') return;
   
     const newNoteDto: CreateTaskNoteDto = {
-      userId: Number(this.userId),
       taskItemId: this.task.id,
       note: newNoteText.trim()
     };

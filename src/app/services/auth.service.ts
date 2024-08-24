@@ -13,8 +13,8 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(loginData: LoginUserDto): Observable<string> {
-    return this.http.post(`${this.authApiUrl}/login`, loginData, { responseType: 'text' });
+  login(loginData: LoginUserDto): Observable<any> {
+    return this.http.post(`${this.authApiUrl}/login`, loginData);
 
   }
 

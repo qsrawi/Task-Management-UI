@@ -13,7 +13,7 @@ export class HeaderNavComponent {
   userRole: string | null = "";
 
   constructor(private router: Router){
-    this.userRole = decodeToken('Role');
+    this.userRole = decodeToken();
   }
 
   onTabClick(isAll: boolean) {

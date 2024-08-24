@@ -1,25 +1,25 @@
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { CreateTaskDto, CreateTaskNoteDto, TaskDto, TaskLogsDto, TaskNoteDto } from '../models/task';
 import { HttpClient } from '@angular/common/http';
 import { UserDto } from '../models/login-user-dto';
-import { RelatedDto } from '../models/related-dto';
+import { SharedService } from './shared.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = 'https://localhost:7118/api';
-  private adminApiUrl = `${this.apiUrl}/Admin`;
+  private adminApiUrl = 'https://localhost:7118/api/Admin';
+  private adminEndpoint = 'Admin';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private sharedService: SharedService) {}
 
   getAllTasks(): Observable<TaskDto[]> {
-    return this.http.get<TaskDto[]>(`${this.adminApiUrl}/GetAllTasks`);
+    return this.sharedService.getAllTasks(`${this.adminEndpoint}/GetAllTasks`);
   }
 
   addNote(note: CreateTaskNoteDto): Observable<TaskNoteDto> {
-    return this.http.post<TaskNoteDto>(`${this.adminApiUrl}/AddNote`, note);
+    return this.sharedService.addNote(`${this.adminEndpoint}/AddNote`, note);
   }
 
   createTask(task: CreateTaskDto): Observable<any> {
@@ -27,30 +27,19 @@ export class AdminService {
   }
 
   getUsers(): Observable<UserDto[]> {
-    return this.http.get<UserDto[]>(`${this.adminApiUrl}/GetUsers`);
+    return this.sharedService.getUsers(`${this.adminEndpoint}/GetUsers`);
   }
 
   getRelated(): Observable<{ [key: string]: Array<{ id: number, name: string }> }> {
-    return this.http.get<RelatedDto[]>(`${this.adminApiUrl}/GetRelated`).pipe(
-      map((data: RelatedDto[]) => {
-        return data.reduce((acc, current) => {
-          const category = current.categoryName;
-          if (!acc[category]) {
-            acc[category] = [];
-          }
-          acc[category].push({ id: current.id, name: current.name });
-          return acc;
-        }, {} as { [key: string]: Array<{ id: number, name: string }> });
-      })
-    );
+    return this.sharedService.getRelated(`${this.adminEndpoint}/GetRelated`);
   }
 
   getNotesByTask(taskId: number): Observable<TaskNoteDto[]> {
-    return this.http.get<TaskNoteDto[]>(`${this.adminApiUrl}/GetNotes/${taskId}`);
+    return this.sharedService.getNotesByTask(`${this.adminEndpoint}/GetNotes`, taskId);
   }
 
   getTaskLogsByTaskId(taskId: number): Observable<TaskLogsDto[]> {
-    return this.http.get<TaskLogsDto[]>(`${this.adminApiUrl}/GetTaskLogs/${taskId}`);
+    return this.sharedService.getTaskLogsByTaskId(`${this.adminEndpoint}/GetTaskLogs`, taskId);
   }
 
   deleteTask(taskId: number): Observable<void> {

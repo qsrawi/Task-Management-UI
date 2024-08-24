@@ -18,10 +18,11 @@ export class LoginComponent {
     this.loginError = '';
 
     this.authService.login(this.loginData).subscribe(
-      (token: string) => {
-        localStorage.setItem('authToken', token);
+      (response: any) => {
+        console.log(response)
+        localStorage.setItem('authToken', response.token);
         localStorage.setItem("isAllTasks", "false");
-        this.router.navigate([`/${decodeToken('Role').toLowerCase()}/task-list`]);
+        this.router.navigate([`/${decodeToken().toLowerCase()}/task-list`]);
       },
       (error) => {
         this.loginError = 'Login failed. Please check your user name and password.';
