@@ -36,7 +36,7 @@ export class TaskListComponent implements OnInit {
 
   filteredTasks(tasks: TaskDto[]): TaskDto[] {
     return tasks.filter((task) =>
-      task.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+      task.title!.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
@@ -53,7 +53,12 @@ export class TaskListComponent implements OnInit {
   }
 
   closeTask(taskId: number): void {
-    this.userService.closeTask(taskId).subscribe(
+    var task = {
+      id: taskId,
+      isClosed : true,
+    } as TaskDto
+
+    this.userService.saveTask(task).subscribe(
       () => {
         this.toastr.success('Task closed successfully', 'Success');
         this.loadTasks(); 

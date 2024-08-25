@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
-import { Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { CreateTaskNoteDto, TaskDto, TaskNoteDto } from '../../models/task';
 import { ToastrService } from 'ngx-toastr';
 import { UserDto } from '../../models/login-user-dto';
@@ -87,11 +87,13 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   fetchNotes(taskId: number): void {
-    this.notes$ = this.userRole === "User" ? this.userService.getNotesByTask(taskId) : this.adminService.getNotesByTask(taskId);
+    this.notes$ = this.userRole === "User" 
+    ? this.userService.getNotesByTask(taskId).pipe(map(res => res.lstData)) 
+    : this.adminService.getNotesByTask(taskId).pipe(map(res => res.lstData)) ;
   }
 
   fetchUsers(): void {
-    this.users$ = this.userService.getUsers();
+    this.users$ = this.userService.getUsers().pipe(map(res => res.lstData));
   }
 
   fetchRelated(): void {
@@ -107,7 +109,8 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   reassignTask(userId: string): void {
-    this.userService.assignTask(this.task.id, userId).subscribe(
+    var task = {id: this.task.id, assignedToUserId: Number(userId)} as TaskDto;
+    this.userService.saveTask(task).subscribe(
       () => {
         this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`]);
         this.toastr.success('Task reassigned successfully', 'Success');
@@ -146,7 +149,7 @@ export class TaskDetailsComponent implements OnInit {
       deadLine: this.taskForm.get('deadLine')?.value
     };
 
-    this.userService.updateTask(updatedTask).subscribe(
+    this.userService.saveTask(updatedTask).subscribe(
       (updatedTask) => {
         this.task = updatedTask;
         this.isEditing = false;
@@ -182,7 +185,7 @@ export class TaskDetailsComponent implements OnInit {
     if (this.userRole === "User")
       this.userService.addNote(newNoteDto).subscribe(
         () => {
-          this.notes$ = this.userService.getNotesByTask(this.task.id);
+          this.notes$ = this.userService.getNotesByTask(this.task.id).pipe(map(res => res.lstData));
           this.taskForm.get('newNote')?.setValue('');
           this.showAddNoteInput = false;
           this.toastr.success('Note added successfully', 'Success');
@@ -195,7 +198,7 @@ export class TaskDetailsComponent implements OnInit {
     else
       this.adminService.addNote(newNoteDto).subscribe(
         () => {
-          this.notes$ = this.adminService.getNotesByTask(this.task.id);
+          this.notes$ = this.adminService.getNotesByTask(this.task.id).pipe(map(res => res.lstData));
           this.taskForm.get('newNote')?.setValue('');
           this.showAddNoteInput = false;
           this.toastr.success('Note added successfully', 'Success');
@@ -214,7 +217,8 @@ export class TaskDetailsComponent implements OnInit {
   
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.adminService.deleteTask(this.task.id).subscribe(() => {
+        var task = {id: this.task.id, isDeleted: true} as TaskDto
+        this.adminService.saveTask(task).subscribe(() => {
           this.toastr.success('Task deleted successfully', 'Success');
           this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`]);
         });

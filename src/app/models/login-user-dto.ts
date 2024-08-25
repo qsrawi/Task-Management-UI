@@ -10,3 +10,8 @@ export interface UserDto {
     role: string | null;
     token: string | null;
 }
+
+export interface UserResponse {
+    lstData: UserDto[];
+    rowsCount: number;
+}

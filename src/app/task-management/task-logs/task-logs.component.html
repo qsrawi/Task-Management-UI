@@ -10,6 +10,7 @@
             </ng-container>
           </span>
           <span *ngIf="log.action === 'Assign'">Assigned to {{ log.value }}</span>
+          <span *ngIf="log.action === 'Closed'">Closed</span>
         </div>
         <div class="line"></div>
       </div>
@@ -17,6 +18,7 @@
         <div *ngIf="log.action === 'Create'" class="box">New</div>
         <div *ngIf="log.action === 'Update'" class="box">Update</div>
         <div *ngIf="log.action === 'Assign'" class="box">Assign</div>
+        <div *ngIf="log.action === 'Closed'" class="box">Completed</div>
         <div class="user">{{ log.modifierUser }}</div>
         <div class="date">{{ log.date | date: 'short' }}</div>
       </div>

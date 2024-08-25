@@ -1,28 +1,29 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreateTaskNoteDto, TaskDto, TaskLogsDto, TaskNoteDto, TaskResponse } from '../models/task';
+import { CreateTaskNoteDto, LogResponse, NoteResponse, TaskDto, TaskLogsDto, TaskNoteDto, TaskResponse } from '../models/task';
 import { HttpClient } from '@angular/common/http';
-import { UserDto } from '../models/login-user-dto';
+import { UserDto, UserResponse } from '../models/login-user-dto';
 import { SharedService } from './shared.service';
+import { GetTaskType } from '../models/get-task-type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private userApiUrl = 'https://localhost:7118/api/User';
+  private userApiUrl = 'https://localhost:7118/api/v1/User';
   private userEndpoint = 'User';
 
   constructor(private http: HttpClient, private sharedService: SharedService) {}
 
   getAllTasksByUser(): Observable<TaskResponse> {
-    return this.http.get<TaskResponse>(`${this.userApiUrl}/GetAllTasksByUser`);
+    return this.sharedService.getAllTasks(`${this.userEndpoint}/GetAllTasks`, GetTaskType.Include);
   }
 
   getAllTasksWithoutUserId(): Observable<TaskResponse> {
-    return this.http.get<TaskResponse>(`${this.userApiUrl}/GetAllTasksWithoutUserId`);
+    return this.sharedService.getAllTasks(`${this.userEndpoint}/GetAllTasks`, GetTaskType.Exclude);
   }
 
-  getNotesByTask(taskId: number): Observable<TaskNoteDto[]> {
+  getNotesByTask(taskId: number): Observable<NoteResponse> {
     return this.sharedService.getNotesByTask(`${this.userEndpoint}/GetNotes`, taskId);
   }
 
@@ -30,15 +31,15 @@ export class UserService {
     return this.sharedService.addNote(`${this.userEndpoint}/AddNote`, note);
   }
 
-  updateTask(task: TaskDto): Observable<TaskDto[]> {
-    return this.http.put<TaskDto[]>(`${this.userApiUrl}/UpdateTask`, task);
+  saveTask(task: TaskDto): Observable<any> {
+    return this.sharedService.saveTask(`${this.userEndpoint}/SaveTask`, task);
   }
 
-  getTaskLogsByTaskId(taskId: number): Observable<TaskLogsDto[]> {
+  getTaskLogsByTaskId(taskId: number): Observable<LogResponse> {
     return this.sharedService.getTaskLogsByTaskId(`${this.userEndpoint}/GetTaskLogs`, taskId);
   }
 
-  getUsers(): Observable<UserDto[]> {
+  getUsers(): Observable<UserResponse> {
     return this.sharedService.getUsers(`${this.userEndpoint}/GetUsers`);
   }
 
@@ -50,7 +51,7 @@ export class UserService {
     return this.sharedService.getRelated(`${this.userEndpoint}/GetRelated`);
   }
   
-  closeTask(taskId: number): Observable<void> {
+  /*closeTask(taskId: number): Observable<void> {
     return this.http.post<void>(`${this.userApiUrl}/CloseTask/${taskId}`, {});
-  }
+  }*/
 }

@@ -8,17 +8,17 @@ import { RegisterUserDto } from '../models/register-user-dto';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7118/api';
+  private apiUrl = 'https://localhost:7118/api/v1';
   private authApiUrl = `${this.apiUrl}/Auth`;
 
   constructor(private http: HttpClient) {}
 
   login(loginData: LoginUserDto): Observable<any> {
-    return this.http.post(`${this.authApiUrl}/login`, loginData);
+    return this.http.post(`${this.authApiUrl}/Login`, loginData);
 
   }
 
   register(registerData: RegisterUserDto): Observable<any> {
-    return this.http.post(`${this.authApiUrl}/register`, registerData);
+    return this.http.post(`${this.authApiUrl}/Register`, registerData);
   }
 }

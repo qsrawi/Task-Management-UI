@@ -1,19 +1,20 @@
 export interface TaskDto {
-  id: number;
-  title: string;
-  description: string;
-  assignedToUserId: number;
-  assignedToUserName: string;
-  createdAt: Date;
-  isClosed: boolean;
+  id?: number;
+  title?: string;
+  description?: string;
+  assignedToUserId?: number;
+  assignedToUserName?: string;
+  createdAt?: Date;
+  isClosed?: boolean;
   creatorUserId?: number;
   notesCount?: number;
   relatedToId: number;
   relatedTo?: number;
   relatedName?: string;
-  createdBy: string;
-  startDate: Date;
-  deadLine: Date;
+  createdBy?: string;
+  startDate?: Date;
+  deadLine?: Date;
+  isDeleted?: boolean;
 }
 
 export interface TaskResponse {
@@ -53,4 +54,14 @@ export interface TaskLogsDto {
   fieldName : string;
   action : string;
   value : string;
+}
+
+export interface LogResponse {
+  lstData: TaskLogsDto[];
+  rowsCount: number;
+}
+
+export interface NoteResponse {
+  lstData: TaskNoteDto[];
+  rowsCount: number;
 }

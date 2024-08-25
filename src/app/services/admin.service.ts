@@ -1,32 +1,28 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreateTaskDto, CreateTaskNoteDto, TaskDto, TaskLogsDto, TaskNoteDto, TaskResponse } from '../models/task';
+import { CreateTaskDto, CreateTaskNoteDto, LogResponse, NoteResponse, TaskDto, TaskLogsDto, TaskNoteDto, TaskResponse } from '../models/task';
 import { HttpClient } from '@angular/common/http';
-import { UserDto } from '../models/login-user-dto';
+import { UserDto, UserResponse } from '../models/login-user-dto';
 import { SharedService } from './shared.service';
+import { GetTaskType } from '../models/get-task-type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-  private adminApiUrl = 'https://localhost:7118/api/Admin';
   private adminEndpoint = 'Admin';
 
   constructor(private http: HttpClient, private sharedService: SharedService) {}
 
   getAllTasks(): Observable<TaskResponse> {
-    return this.sharedService.getAllTasks(`${this.adminEndpoint}/GetAllTasks`);
+    return this.sharedService.getAllTasks(`${this.adminEndpoint}/GetAllTasks`, GetTaskType.All);
   }
 
   addNote(note: CreateTaskNoteDto): Observable<TaskNoteDto> {
     return this.sharedService.addNote(`${this.adminEndpoint}/AddNote`, note);
   }
 
-  createTask(task: CreateTaskDto): Observable<any> {
-    return this.http.post(`${this.adminApiUrl}/CreateTask`, task);
-  }
-
-  getUsers(): Observable<UserDto[]> {
+  getUsers(): Observable<UserResponse> {
     return this.sharedService.getUsers(`${this.adminEndpoint}/GetUsers`);
   }
 
@@ -34,15 +30,19 @@ export class AdminService {
     return this.sharedService.getRelated(`${this.adminEndpoint}/GetRelated`);
   }
 
-  getNotesByTask(taskId: number): Observable<TaskNoteDto[]> {
+  getNotesByTask(taskId: number): Observable<NoteResponse> {
     return this.sharedService.getNotesByTask(`${this.adminEndpoint}/GetNotes`, taskId);
   }
 
-  getTaskLogsByTaskId(taskId: number): Observable<TaskLogsDto[]> {
+  getTaskLogsByTaskId(taskId: number): Observable<LogResponse> {
     return this.sharedService.getTaskLogsByTaskId(`${this.adminEndpoint}/GetTaskLogs`, taskId);
   }
 
-  deleteTask(taskId: number): Observable<void> {
-    return this.http.delete<void>(`${this.adminApiUrl}/DeleteTask/${taskId}`);
+  saveTask(task: TaskDto): Observable<any> {
+    return this.sharedService.saveTask(`${this.adminEndpoint}/SaveTask`, task);
   }
+
+  /*deleteTask(taskId: number): Observable<void> {
+    return this.http.delete<void>(`${this.adminApiUrl}/DeleteTask/${taskId}`);
+  }*/
 }

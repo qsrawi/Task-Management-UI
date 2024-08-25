@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { UserService } from '../../services/user.service';
-import { Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { TaskLogsDto } from '../../models/task';
 import { AdminService } from '../../services/admin.service';
 
@@ -21,6 +21,8 @@ export class TaskLogsComponent implements OnInit {
   }
 
   fetchLogs(taskId: number): void {
-    this.logs$ = this.userRole == "User" ? this.userService.getTaskLogsByTaskId(taskId) :  this.adminService.getTaskLogsByTaskId(taskId);
+    this.logs$ = this.userRole == "User" 
+    ? this.userService.getTaskLogsByTaskId(taskId).pipe(map(res =>res.lstData)) 
+    : this.adminService.getTaskLogsByTaskId(taskId).pipe(map(res =>res.lstData));
   }
 }

@@ -1,43 +1,57 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
-import { TaskDto, TaskNoteDto, TaskLogsDto, CreateTaskNoteDto, TaskResponse } from '../models/task';
-import { UserDto } from '../models/login-user-dto';
-import { RelatedDto } from '../models/related-dto';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { TaskNoteDto, TaskLogsDto, CreateTaskNoteDto, TaskResponse, NoteResponse, LogResponse, TaskDto } from '../models/task';
+import { UserDto, UserResponse } from '../models/login-user-dto';
+import { RelatedDto, RelatedResponse } from '../models/related-dto';
+import { GetTaskType } from '../models/get-task-type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SharedService {
-  private apiUrl = 'https://localhost:7118/api';
+  private apiUrl = 'https://localhost:7118/api/v1';
 
   constructor(private http: HttpClient) {}
 
-  getAllTasks(endpoint: string): Observable<TaskResponse> {
-    return this.http.get<TaskResponse>(`${this.apiUrl}/${endpoint}`);
+  getAllTasks(endpoint: string, type: GetTaskType = GetTaskType.All): Observable<TaskResponse> {
+    let params = new HttpParams();
+    params = params.set('Type', type);
+
+    return this.http.get<TaskResponse>(`${this.apiUrl}/${endpoint}`, { params });
   }
 
-  getNotesByTask(endpoint: string, taskId: number): Observable<TaskNoteDto[]> {
-    return this.http.get<TaskNoteDto[]>(`${this.apiUrl}/${endpoint}/${taskId}`);
+  getNotesByTask(endpoint: string, taskId: number): Observable<NoteResponse> {
+    let params = new HttpParams();
+    params = params.set('taskID', taskId);
+
+    return this.http.get<NoteResponse>(`${this.apiUrl}/${endpoint}`, { params });
   }
 
   addNote(endpoint: string, note: CreateTaskNoteDto): Observable<TaskNoteDto> {
     return this.http.post<TaskNoteDto>(`${this.apiUrl}/${endpoint}`, note);
   }
 
-  getTaskLogsByTaskId(endpoint: string, taskId: number): Observable<TaskLogsDto[]> {
-    return this.http.get<TaskLogsDto[]>(`${this.apiUrl}/${endpoint}/${taskId}`);
+  saveTask(endpoint: string, task: TaskDto): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${endpoint}`, task);
   }
 
-  getUsers(endpoint: string): Observable<UserDto[]> {
-    return this.http.get<UserDto[]>(`${this.apiUrl}/${endpoint}`);
+  getTaskLogsByTaskId(endpoint: string, taskId: number): Observable<LogResponse> {
+    let params = new HttpParams();
+    params = params.set('taskID', taskId);
+
+    return this.http.get<LogResponse>(`${this.apiUrl}/${endpoint}`, { params });
+  }
+
+  getUsers(endpoint: string): Observable<UserResponse> {
+    return this.http.get<UserResponse>(`${this.apiUrl}/${endpoint}`);
   }
 
   getRelated(endpoint: string): Observable<{ [key: string]: Array<{ id: number, name: string }> }> {
-    return this.http.get<RelatedDto[]>(`${this.apiUrl}/${endpoint}`).pipe(
-      map((data: RelatedDto[]) => {
-        return data.reduce((acc, current) => {
+    return this.http.get<RelatedResponse>(`${this.apiUrl}/${endpoint}`).pipe(
+      map((data: RelatedResponse) => {
+        return data.lstData.reduce((acc, current) => {
           const category = current.categoryName;
           if (!acc[category]) {
             acc[category] = [];

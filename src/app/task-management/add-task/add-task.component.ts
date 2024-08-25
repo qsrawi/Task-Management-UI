@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
-import { Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { UserDto } from '../../models/login-user-dto';
 import { ToastrService } from 'ngx-toastr';
 import { TaskConfig } from '../../models/task-config';
@@ -28,7 +28,7 @@ export class AddTaskComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router
   ) {
-    this.users$ = this.adminService.getUsers();
+    this.users$ = this.adminService.getUsers().pipe(map(res => res.lstData));
     this.addTaskForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', Validators.required],
@@ -52,7 +52,7 @@ export class AddTaskComponent implements OnInit {
         ...this.addTaskForm.value
       };
 
-      this.adminService.createTask(newTask).subscribe(() => {
+      this.adminService.saveTask(newTask).subscribe(() => {
         this.toastr.success('Task deleted successfully', 'Success');
         this.router.navigate(['/admin/task-list']);
       });
