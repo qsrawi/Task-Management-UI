@@ -18,6 +18,10 @@ export class AdminService {
     return this.sharedService.getAllTasks(`${this.adminEndpoint}/GetAllTasks`, GetTaskType.All);
   }
 
+  getTask(taskId: number): Promise<TaskDto> {
+    return this.sharedService.getTask(`${this.adminEndpoint}/GetTask`, taskId);
+  }
+
   addNote(note: CreateTaskNoteDto): Observable<TaskNoteDto> {
     return this.sharedService.addNote(`${this.adminEndpoint}/AddNote`, note);
   }

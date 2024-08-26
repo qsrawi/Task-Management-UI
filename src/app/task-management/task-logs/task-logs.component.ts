@@ -22,7 +22,29 @@ export class TaskLogsComponent implements OnInit {
 
   fetchLogs(taskId: number): void {
     this.logs$ = this.userRole == "User" 
-    ? this.userService.getTaskLogsByTaskId(taskId).pipe(map(res =>res.lstData)) 
-    : this.adminService.getTaskLogsByTaskId(taskId).pipe(map(res =>res.lstData));
+    ? this.userService.getTaskLogsByTaskId(taskId).pipe(map(res =>res.lstData), map(logs => this.sortLogs(logs))) 
+    : this.adminService.getTaskLogsByTaskId(taskId).pipe(map(res =>res.lstData), map(logs => this.sortLogs(logs)));
+  }
+
+  sortLogs(logs: TaskLogsDto[]): TaskLogsDto[] {
+    return logs.sort((a, b) => {
+      const priorityA = this.getActionPriority(a.action);
+      const priorityB = this.getActionPriority(b.action);
+      return priorityA - priorityB;
+    });
+  }
+
+  getActionPriority(action: string): number {
+    switch (action) {
+      case 'Create':
+        return 1;
+      case 'Assign':
+      case 'Update':
+        return 2;
+      case 'Closed':
+        return 3;
+      default:
+        return 4;
+    }
   }
 }

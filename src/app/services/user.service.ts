@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 import { CreateTaskNoteDto, LogResponse, NoteResponse, TaskDto, TaskLogsDto, TaskNoteDto, TaskResponse } from '../models/task';
 import { HttpClient } from '@angular/common/http';
 import { UserDto, UserResponse } from '../models/login-user-dto';
@@ -21,6 +21,10 @@ export class UserService {
 
   getAllTasksWithoutUserId(): Observable<TaskResponse> {
     return this.sharedService.getAllTasks(`${this.userEndpoint}/GetAllTasks`, GetTaskType.Exclude);
+  }
+
+  getTask(taskId: number): Promise<TaskDto> {
+    return this.sharedService.getTask(`${this.userEndpoint}/GetTask`, taskId);
   }
 
   getNotesByTask(taskId: number): Observable<NoteResponse> {

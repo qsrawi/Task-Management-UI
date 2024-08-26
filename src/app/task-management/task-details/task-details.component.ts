@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable, of, take } from 'rxjs';
 import { CreateTaskNoteDto, TaskDto, TaskNoteDto } from '../../models/task';
 import { ToastrService } from 'ngx-toastr';
 import { UserDto } from '../../models/login-user-dto';
@@ -34,24 +34,25 @@ export class TaskDetailsComponent implements OnInit {
   selectedUserId: number = 0;
   isEditable: boolean = true;
   quillConfig = TaskConfig.quillConfig;
-  
+  taskId: number = 0;
   relatedNameOptions: Array<{ id: number, name: string }> = [];
   relatedOptionsByCategory: { [key: string]: Array<{ id: number, name: string }> } = {};
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private fb: FormBuilder,
     private toastr: ToastrService,
     private userService: UserService,
     private adminService: AdminService,
     private dialog: MatDialog
-  ) {
-    const navigation = this.router.getCurrentNavigation();
-    this.task = navigation?.extras?.state?.['task'];
-  }
+  ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.userRole = decodeToken();
+    this.taskId = Number(this.route.snapshot.paramMap.get('id'));
+    await this.fetchTask();
+
     const isAllTasks = localStorage.getItem('isAllTasks');
   
     if(this.userRole === "Admin" || isAllTasks === "true" || this.task?.isClosed == true)
@@ -96,6 +97,12 @@ export class TaskDetailsComponent implements OnInit {
     this.users$ = this.userService.getUsers().pipe(map(res => res.lstData));
   }
 
+  async fetchTask(): Promise<void> {
+     this.task = this.userRole === "User"
+    ? await this.userService.getTask(this.taskId)
+    : await this.adminService.getTask(this.taskId)
+  }
+
   fetchRelated(): void {
     this.userRole === "User" 
     ? this.userService.getRelated().subscribe((data) => {
@@ -133,9 +140,8 @@ export class TaskDetailsComponent implements OnInit {
 
   onSave(): void {
     if (!this.isEditing) return;
-    
     const updatedTask: TaskDto = {
-      id: this.task.id,
+      id: this.taskId,
       title: this.taskForm.get('title')?.value,
       description: this.taskForm.get('description')?.value,
       assignedToUserId: this.taskForm.get('assignedToUserId')?.value,
@@ -233,7 +239,7 @@ export class TaskDetailsComponent implements OnInit {
   }
 
   refreshLogs(): void {
-    this.taskLogsComponent.fetchLogs(this.task.id);
+    this.taskLogsComponent.fetchLogs(this.taskId);
   }
 
   onRelatedToChange(event: Event): void {

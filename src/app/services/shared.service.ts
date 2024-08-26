@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { TaskNoteDto, TaskLogsDto, CreateTaskNoteDto, TaskResponse, NoteResponse, LogResponse, TaskDto } from '../models/task';
@@ -46,6 +46,13 @@ export class SharedService {
 
   getUsers(endpoint: string): Observable<UserResponse> {
     return this.http.get<UserResponse>(`${this.apiUrl}/${endpoint}`);
+  }
+
+  getTask(endpoint: string, taskId: number): Promise<TaskDto> {
+    let params = new HttpParams();
+    params = params.set('taskID', taskId);
+    
+    return lastValueFrom(this.http.get<TaskDto>(`${this.apiUrl}/${endpoint}`, { params }));
   }
 
   getRelated(endpoint: string): Observable<{ [key: string]: Array<{ id: number, name: string }> }> {
