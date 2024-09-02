@@ -10,7 +10,10 @@ import { TaskLogsComponent } from './task-logs/task-logs.component';
 import { QuillModule } from 'ngx-quill';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
-import { AddTaskComponent } from './add-task/add-task.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { MatTableModule } from '@angular/material/table';
+import { MatCardModule } from '@angular/material/card';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
   declarations: [
@@ -18,10 +21,10 @@ import { AddTaskComponent } from './add-task/add-task.component';
     TaskDetailsComponent,
     HeaderNavComponent,
     TaskLogsComponent,
-    AddTaskComponent
   ],
   imports: [
     CommonModule,
+    NgSelectModule,
     FormsModule,
     ReactiveFormsModule,
     TaskManagementRoutingModule,
@@ -30,6 +33,9 @@ import { AddTaskComponent } from './add-task/add-task.component';
     CdkDrag,
     QuillModule.forRoot(),
     MatDialogModule,
+    MatTableModule,
+    MatCardModule,
+    MatPaginatorModule,
     MatButtonModule
   ]
 })

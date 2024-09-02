@@ -18,3 +18,7 @@
     margin-left: 8px;
   }
   
+  .mat-dialog-actions .mat-button.primary {
+    background-color: #4caf50 !important; 
+    color: #fff;
+  }

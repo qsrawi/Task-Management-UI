@@ -1,17 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserService } from '../../services/user.service';
 import { map, Observable, of, take } from 'rxjs';
 import { CreateTaskNoteDto, TaskDto, TaskNoteDto } from '../../models/task';
 import { ToastrService } from 'ngx-toastr';
 import { UserDto } from '../../models/login-user-dto';
-import { AdminService } from '../../services/admin.service';
 import { ConfirmDialogComponent } from '../../helper/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskLogsComponent } from '../task-logs/task-logs.component';
 import { TaskConfig } from '../../models/task-config';
 import { decodeToken } from '../../helper/jwt-decode';
+import { TaskService } from '../../services/task.service';
+import { CategoryDto } from '../../models/related-dto';
+import { LocalStorageService } from '../../services/local-storage.service';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-task-details',
@@ -21,12 +22,13 @@ import { decodeToken } from '../../helper/jwt-decode';
 export class TaskDetailsComponent implements OnInit {
   @ViewChild(TaskLogsComponent) taskLogsComponent!: TaskLogsComponent;
 
-  notes$: Observable<TaskNoteDto[]> = of([]);
-  users$: Observable<UserDto[]> = of([]);
-  
-  taskForm!: FormGroup;
-  task: any;
-  isEditing: boolean = false;
+  notes: TaskNoteDto[] = [];
+  users: UserDto[] = [];
+  categories: CategoryDto[] = []; 
+
+  task: any = {};
+  isFieldNotDisabled: boolean = true;
+  isEditMode: boolean = false;
   showAddNoteInput: boolean = false; 
   newNote: string = ''; 
   showLogs: boolean = false;
@@ -35,196 +37,166 @@ export class TaskDetailsComponent implements OnInit {
   isEditable: boolean = true;
   quillConfig = TaskConfig.quillConfig;
   taskId: number = 0;
+  pageSize = 5;
+  totalNotes = 0;
   relatedNameOptions: Array<{ id: number, name: string }> = [];
-  relatedOptionsByCategory: { [key: string]: Array<{ id: number, name: string }> } = {};
+  isFirstExecution = true; 
+  private optionsCache: { [categoryId: string]: any[] } = {};
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder,
     private toastr: ToastrService,
-    private userService: UserService,
-    private adminService: AdminService,
+    private taskService: TaskService,
+    private localStorageService: LocalStorageService,
     private dialog: MatDialog
   ) { }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.userRole = decodeToken();
     this.taskId = Number(this.route.snapshot.paramMap.get('id'));
-    await this.fetchTask();
+    this.fetchCategories();
+    this.fetchUsers();
 
-    const isAllTasks = localStorage.getItem('isAllTasks');
+    if(this.taskId != 0){
+      this.fetchTask();
+      this.isEditMode = true;
+      this.isFieldNotDisabled = false;
+    }
+
+    const isAllTasks = this.localStorageService.getItem('isAllTasks');
   
     if(this.userRole === "Admin" || isAllTasks === "true" || this.task?.isClosed == true)
       this.isEditable = false;
-  
-    const formattedStartDate = this.formatDate(this.task?.startDate);
-    const formattedDeadLine = this.formatDate(this.task?.deadLine);
+  }
 
-    this.taskForm = this.fb.group({
-      title: [{ value: this.task?.title || '', disabled: !this.isEditing }],
-      description: [{ value: this.task?.description || '', disabled: !this.isEditing }],
-      assignedToUserId: [this.task?.assignedToUserId || ''],
-      relatedTo: [{ value: this.task?.relatedTo || '', disabled: !this.isEditing }],
-      relatedToId: [{ value: this.task?.relatedToId || '', disabled: !this.isEditing }],
-      startDate: [{ value: formattedStartDate || '', disabled: !this.isEditing }],
-      deadLine: [{ value: formattedDeadLine || '', disabled: !this.isEditing }],
-      newNote: ['']
+  fetchNotes(page: number = 1, pageSize: number = 5): void {
+    this.taskService.getNotesByTask(this.taskId, page, pageSize).pipe(
+      take(1)
+    ).subscribe(response => {
+      this.notes = response.lstData;
+      this.totalNotes = response.rowsCount;
     });
+  }
 
-    this.fetchNotes(this.task?.id);
-    this.fetchRelated();
+  fetchCategories(): void {
+    this.taskService.GetCategories().pipe(map(res => res.lstData), take(1)).subscribe(response =>
+      this.categories = response
+    );
+  }
+
+  fetchUsers(): void {
+    this.taskService.getUsers().pipe(map(res => res.lstData)).subscribe(users =>
+      this.users = users
+    );
+  }
+
+  fetchTask(): void {
+    this.taskService.getTask(this.taskId).pipe(take(1)).subscribe(x => {
+      this.task = x;
+      this.task.startDate = this.formatDate(this.task.startDate);
+      this.task.deadLine = this.formatDate(this.task.deadLine);
+      this.fetchNotes();
+      this.fetchRelated();
+    });
+  }
+
+  fetchRelated(): void {
+    this.onRelatedToChange(this.task.categoryId);
+  }
   
-    if(this.userRole === "User"){
-      this.fetchUsers();
-  
-      this.taskForm.get('assignedToUserId')?.valueChanges.subscribe(userId => {
-        if (userId && !this.taskForm.get('assignedToUserId')?.disabled) {
-          this.reassignTask(userId);
-          this.taskForm.get('assignedToUserId')?.disable();
+  reassignTask(userId: string): void {
+    var task = {id: this.task.id, assignedToUserId: Number(userId)} as TaskDto;
+
+    if (this.isEditMode) {
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        width: '300px',
+        data: { 
+          message: 'Are you sure you want to change the assignment of this task?',
+          confirmButtonLabel: 'Reassign',
+          confirmButtonColor: 'primary'
+        }
+      });
+    
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.taskService.saveTask(task).subscribe(() => {
+            this.toastr.success('Task reassigned successfully', 'Success');
+            this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`]);
+          });
+        } else {
+          this.toastr.error('Task reassigning was canceled', 'Error');
         }
       });
     }
   }
 
-  fetchNotes(taskId: number): void {
-    this.notes$ = this.userRole === "User" 
-    ? this.userService.getNotesByTask(taskId).pipe(map(res => res.lstData)) 
-    : this.adminService.getNotesByTask(taskId).pipe(map(res => res.lstData)) ;
-  }
-
-  fetchUsers(): void {
-    this.users$ = this.userService.getUsers().pipe(map(res => res.lstData));
-  }
-
-  async fetchTask(): Promise<void> {
-     this.task = this.userRole === "User"
-    ? await this.userService.getTask(this.taskId)
-    : await this.adminService.getTask(this.taskId)
-  }
-
-  fetchRelated(): void {
-    this.userRole === "User" 
-    ? this.userService.getRelated().subscribe((data) => {
-      this.relatedOptionsByCategory = data;
-      this.updateRelatedNameOptions(this.taskForm.get('relatedTo')?.value);
-    })
-    : this.adminService.getRelated().subscribe((data) => {
-      this.relatedOptionsByCategory = data;
-      this.updateRelatedNameOptions(this.taskForm.get('relatedTo')?.value);
-    })
-  }
-
-  reassignTask(userId: string): void {
-    var task = {id: this.task.id, assignedToUserId: Number(userId)} as TaskDto;
-    this.userService.saveTask(task).subscribe(
-      () => {
-        this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`]);
-        this.toastr.success('Task reassigned successfully', 'Success');
-      },
-      () => {
-        this.toastr.error('Error reassigning task', 'Error');
-      }
-    );
-  }
-
   onEdit(): void {
-    this.isEditing = true;
-    this.taskForm.get('relatedTo')?.enable();
-    this.taskForm.get('relatedToId')?.enable();
-    this.taskForm.get('startDate')?.enable();
-    this.taskForm.get('deadLine')?.enable();
-    this.taskForm.get('description')?.enable();
-    this.taskForm.get('title')?.enable();
+    this.isFieldNotDisabled = true;
   }
 
   onSave(): void {
-    if (!this.isEditing) return;
-    const updatedTask: TaskDto = {
-      id: this.taskId,
-      title: this.taskForm.get('title')?.value,
-      description: this.taskForm.get('description')?.value,
-      assignedToUserId: this.taskForm.get('assignedToUserId')?.value,
-      assignedToUserName: this.task.assignedToUserName,
-      createdAt: this.task.createdAt,
-      isClosed: this.task.isClosed,
-      createdBy: this.task.createdBy,
-      creatorUserId: this.task.creatorUserId,
-      relatedToId: this.taskForm.get('relatedToId')?.value,
-      startDate: this.taskForm.get('startDate')?.value,
-      deadLine: this.taskForm.get('deadLine')?.value
-    };
+    if (!this.isFieldNotDisabled) return;
+    this.task.startDate = this.formatDate(this.task?.startDate);
+    this.task.deadLine = this.formatDate(this.task?.deadLine);
 
-    this.userService.saveTask(updatedTask).subscribe(
-      (updatedTask) => {
-        this.task = updatedTask;
-        this.isEditing = false;
-        this.toastr.success('Task updated successfully', 'Success');
-        this.taskForm.get('relatedTo')?.disable();
-        this.taskForm.get('relatedToId')?.disable();
-        this.taskForm.get('startDate')?.disable();
-        this.taskForm.get('deadLine')?.disable();
-        this.taskForm.get('description')?.disable(); 
-      },
+    this.taskService.saveTask(this.task).subscribe(
       () => {
-        this.toastr.error('Error updating task', 'Error');
+        this.isEditMode? this.fetchTask(): this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`]);
+        this.isFieldNotDisabled = false;
+        this.isFirstExecution = true;
+        this.toastr.success('Task updated successfully', 'Success');
+      },
+      (error) => {
+        if (error.status === 400) {
+          this.toastr.error('One or more fields are required', 'Error');
+        } else {
+          this.toastr.error('Error updating task', 'Error');
+        }
       }
     );
   }
 
   onCancel(): void {
-    localStorage.setItem("isAllTasks", "false");
-    this.isEditing = false;
+    this.localStorageService.setItem('isAllTasks', 'false');
+    this.isFieldNotDisabled = false;
     this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`]);
   }
 
   addNote(): void {
-    const newNoteText = this.taskForm.get('newNote')?.value;
-  
-    if (newNoteText.trim() === '') return;
+    if (this.newNote.trim() === '') return;
   
     const newNoteDto: CreateTaskNoteDto = {
       taskItemId: this.task.id,
-      note: newNoteText.trim()
+      note: this.newNote.trim()
     };
   
-    if (this.userRole === "User")
-      this.userService.addNote(newNoteDto).subscribe(
-        () => {
-          this.notes$ = this.userService.getNotesByTask(this.task.id).pipe(map(res => res.lstData));
-          this.taskForm.get('newNote')?.setValue('');
-          this.showAddNoteInput = false;
-          this.toastr.success('Note added successfully', 'Success');
-        },
-        () => {
-          this.toastr.error('Error adding note', 'Error');
-        }
-      );
-
-    else
-      this.adminService.addNote(newNoteDto).subscribe(
-        () => {
-          this.notes$ = this.adminService.getNotesByTask(this.task.id).pipe(map(res => res.lstData));
-          this.taskForm.get('newNote')?.setValue('');
-          this.showAddNoteInput = false;
-          this.toastr.success('Note added successfully', 'Success');
-        },
-        () => {
-          this.toastr.error('Error adding note', 'Error');
-        }
-      );
+    this.taskService.addNote(newNoteDto).subscribe(
+      () => {
+        this.fetchNotes();
+        this.newNote = '';
+        this.showAddNoteInput = false;
+        this.toastr.success('Note added successfully', 'Success');
+      },
+      () => {
+        this.toastr.error('Error adding note', 'Error');
+      }
+    );
   }
 
   onDeleteTask(): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '300px',
-      data: { message: 'Are you sure you want to delete this task?' }
+      data: { 
+        message: 'Are you sure you want to delete this task?',
+        confirmButtonLabel: 'Delete',
+        confirmButtonColor: 'warn' 
+      }
     });
   
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        var task = {id: this.task.id, isDeleted: true} as TaskDto
-        this.adminService.saveTask(task).subscribe(() => {
+        this.taskService.deleteTask(this.task.id).subscribe(() => {
           this.toastr.success('Task deleted successfully', 'Success');
           this.router.navigate([`/${this.userRole?.toLocaleLowerCase()}/task-list`]);
         });
@@ -242,23 +214,57 @@ export class TaskDetailsComponent implements OnInit {
     this.taskLogsComponent.fetchLogs(this.taskId);
   }
 
-  onRelatedToChange(event: Event): void {
-    const relatedTo = (event.target as HTMLSelectElement).value;
-    this.updateRelatedNameOptions(relatedTo);
-  
-    this.taskForm.get('relatedToId')?.setValue('');
+  onNotesPageChange(event: any): void {
+    const pageIndex = (event.pageIndex) + 1;
+    const pageSize = event.pageSize;
+    this.fetchNotes(pageIndex, pageSize);
   }
 
-  updateRelatedNameOptions(relatedTo: string): void {
-    this.relatedNameOptions = this.relatedOptionsByCategory[relatedTo] || [];
+  onRelatedToChange(categoryId: any): void {  
+    if (categoryId) {
+      if (this.optionsCache[categoryId])
+        this.relatedNameOptions = this.optionsCache[categoryId];
+      else
+        this.taskService.getRelatedNameOptions(categoryId).pipe(
+          map(options => {
+            return options.lstData.map(option => ({ id: option.id, name: option.name }));
+          })
+        ).subscribe(options => {
+          this.relatedNameOptions = options;
+          this.optionsCache[categoryId] = options;
+
+          if (!this.isFirstExecution) {
+            this.task.relatedToId = '';
+          }
+    
+          this.isFirstExecution = false;
+        });
+    }
   }
 
   formatDate(date: any): string {
     if (!date) return '';
-    const d = new Date(date);
-    const month = `0${d.getMonth() + 1}`.slice(-2);
-    const day = `0${d.getDate()}`.slice(-2);
-    const year = d.getFullYear();
+  
+    const parsedDate = new Date(date);
+    const year = parsedDate.getFullYear();
+    const month = ('0' + (parsedDate.getMonth() + 1)).slice(-2); 
+    const day = ('0' + parsedDate.getDate()).slice(-2);
+  
     return `${year}-${month}-${day}`;
+  }
+  
+  parseDate(dateString: string): Date | null {
+    if (!dateString) return null;
+  
+    const [year, month, day] = dateString.split('-');
+    return new Date(+year, +month - 1, +day);
+  }
+  
+  onStartDateChange(newDate: string): void {
+    this.task.startDate = this.formatDate(newDate);
+  }
+  
+  onDeadLineChange(newDate: string): void {
+    this.task.deadLine = this.formatDate(newDate);
   }
 }

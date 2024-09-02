@@ -2,11 +2,11 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { map, Observable, of, tap } from 'rxjs';
 import { TaskDto, TaskResponse } from '../../models/task';
-import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
-import { AdminService } from '../../services/admin.service';
 import { ToastrService } from 'ngx-toastr';
 import { decodeToken } from '../../helper/jwt-decode';
+import { TaskService } from '../../services/task.service';
+import { GetTaskType } from '../../models/get-task-type';
 
 @Component({
   selector: 'app-task-list',
@@ -15,16 +15,18 @@ import { decodeToken } from '../../helper/jwt-decode';
 })
 export class TaskListComponent implements OnInit {
   tasks$: Observable<TaskResponse> = of();
-  inProgressTasks$: Observable<TaskDto[]> = of([]);
-  completedTasks$: Observable<TaskDto[]> = of([]);
+  inProgressTasks: TaskDto[] = [];
+  completedTasks: TaskDto[] = [];
 
   searchTerm: string = '';
   userRole: string | null = '';
   isAll: boolean = false
+  currentPage: number = 1;
+  pageSize: number = 5;
+  totalItems: number = 0;
 
   constructor(
-    private userService: UserService,
-    private adminService: AdminService,
+    private taskService: TaskService,
     private toastr: ToastrService,
     private router: Router
   ) {}
@@ -32,6 +34,11 @@ export class TaskListComponent implements OnInit {
   ngOnInit(): void {
     this.userRole = decodeToken();
     this.loadTasks(); 
+  }
+
+  get totalPages(): number[] {
+    const totalPages = Math.ceil(this.totalItems / this.pageSize);
+    return Array(totalPages).fill(0).map((_, index) => index + 1); 
   }
 
   filteredTasks(tasks: TaskDto[]): TaskDto[] {
@@ -54,12 +61,7 @@ export class TaskListComponent implements OnInit {
   }
 
   closeTask(taskId: number): void {
-    var task = {
-      id: taskId,
-      isClosed : true,
-    } as TaskDto
-
-    this.userService.saveTask(task).subscribe(
+    this.taskService.closeTask(taskId).subscribe(
       () => {
         this.toastr.success('Task closed successfully', 'Success');
         this.loadTasks(); 
@@ -72,23 +74,27 @@ export class TaskListComponent implements OnInit {
   }
 
   loadTasks(): void {
-    if (this.userRole == "Admin")
-      this.tasks$ = this.adminService.getAllTasks();
-    else if (!this.isAll)
-      this.tasks$ = this.userService.getAllTasksByUser();
-    else
-      this.tasks$ = this.userService.getAllTasksWithoutUserId();
-
-    this.inProgressTasks$ = this.tasks$.pipe(
-      map(tasks => tasks.lstData.filter(task => !task.isClosed))
+    this.tasks$ = this.taskService.getAllTasks(
+      this.userRole === 'Admin' ? GetTaskType.All : !this.isAll ? GetTaskType.Include : GetTaskType.Exclude,
+      this.currentPage,
+      this.pageSize,
+      this.searchTerm 
     );
-    this.completedTasks$ = this.tasks$.pipe(
-      map(tasks => tasks.lstData.filter(task => task.isClosed))
-    );
+    
+    this.tasks$.subscribe(tasks => {
+      this.inProgressTasks = tasks.lstData.filter(task => !task.isClosed)
+      this.completedTasks = tasks.lstData.filter(task => task.isClosed)
+      this.totalItems = tasks.rowsCount;
+    })
   }
 
   handleTabChange(isAll: boolean) {
     this.isAll = isAll;
+    this.loadTasks();
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
     this.loadTasks();
   }
 }

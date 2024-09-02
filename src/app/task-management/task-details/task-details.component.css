@@ -31,7 +31,7 @@
   padding: 0.5rem 0.75rem;
   border: 1px solid #ced4da;
   transition: border-color 0.3s ease;
-  background-color: #f8f9fa;
+  background-color: white;
 }
 
 .form-control-sm:focus {
@@ -135,27 +135,41 @@
   border-color: #4e0a9f;
 }
 
-.form-select-sm {
-  width: 100%;
-  font-size: 0.875rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 5px;
-  border: 1px solid #ced4da;
-  background-color: #f8f9fa;
-}
-
-.form-select-sm:focus {
-  border-color: #6a11cb;
-  box-shadow: 0 0 0 0.2rem rgba(106, 17, 203, 0.25);
-}
-
 .custom-input {
-  background-color: #f8f9fa;
+  background-color: white;
   border-radius: 5px;
   padding: 0.25rem 0.5rem;
 }
 
 .quill-editor {
+  background-color: white;
   min-height: 50px !important;
   max-height: 500px;
+}
+
+.view-only {
+  cursor: default; 
+  background-color: #f8f9fa !important;
+  color: #8b949b !important;
+  border: 1px solid #dacece;
+}
+
+::ng-deep .view-only .ng-select-container {
+  cursor: default; 
+  background-color: #f8f9fa !important;
+  color: #8b949b !important;
+  border: 1px solid #dacece !important;
+}
+
+::ng-deep .view-only .ng-select-container .ng-value {
+  background-color: #f8f9fa !important;
+  color: #8b949b !important;
+}
+
+::ng-deep .view-only .ng-placeholder {
+  color: #8b949b !important;
+}
+
+::ng-deep .view-only .ng-select-container .ng-arrow-wrapper {
+  display: none;
 }

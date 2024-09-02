@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { decodeToken } from '../../helper/jwt-decode';
+import { LocalStorageService } from '../../services/local-storage.service';
 
 @Component({
   selector: 'app-header-nav',
@@ -12,13 +13,13 @@ export class HeaderNavComponent {
 
   userRole: string | null = "";
 
-  constructor(private router: Router){
+  constructor(private router: Router, private localStorageService: LocalStorageService){
     this.userRole = decodeToken();
   }
 
   onTabClick(isAll: boolean) {
     this.tabChange.emit(isAll);
-    localStorage.setItem("isAllTasks", isAll.toString());
+    this.localStorageService.setItem('isAllTasks', isAll.toString());
   }
 
   onAddClick() {
@@ -26,7 +27,7 @@ export class HeaderNavComponent {
   }
 
   logout() {
-    localStorage.clear();
+    this.localStorageService.clear();
     this.router.navigate(['/']);
   }
 }

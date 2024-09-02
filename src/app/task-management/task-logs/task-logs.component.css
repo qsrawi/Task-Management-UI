@@ -1,68 +1,43 @@
 .state-graph {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
     margin: 20px 0;
 }
 
-.state {
-    flex: 1 1 calc(25% - 20px);
-    max-width: calc(25% - 20px);
+.state-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.state-table th, .state-table td {
+    padding: 12px;
     text-align: center;
-    margin-bottom: 20px;
 }
 
-.arrow {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-}
-
-.action {
-    position: absolute;
-    top: -30px;
+.state-table th {
+    background-color: #f1f1f1;
     font-weight: bold;
-    font-size: 10px;
-    color: #5a5a5a;
-    text-align: center;
-    width: 100%;
-    line-height: 1.2;
-    padding-bottom: 5px;
+    color: #333;
 }
 
-.line {
-    width: 100%;
-    height: 2px;
+.state-table td {
+    border-bottom: 1px solid #ddd;
 }
 
-.info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.box {
-    width: 70px;
-    height: 70px;
+.state-table .box {
+    width: 60px;
+    height: 50px;
     background-color: #007bff;
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    margin-bottom: 10px;
+    margin: 0 auto;
     font-weight: bold;
-    font-size: 11px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
-.user, .date {
+.state-table .user, .state-table .date {
     font-size: 12px;
     color: #555;
-}
-
-.state:last-child .arrow .line {
-    display: none;
 }

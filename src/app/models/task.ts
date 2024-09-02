@@ -9,7 +9,7 @@ export interface TaskDto {
   creatorUserId?: number;
   notesCount?: number;
   relatedToId: number;
-  relatedTo?: number;
+  categoryId?: number;
   relatedName?: string;
   createdBy?: string;
   startDate?: Date;

@@ -1,30 +1,66 @@
-<div *ngIf="logs$ | async as logs; else noLogs" class="state-graph">
-    <div *ngFor="let log of logs" class="state">
-      <div class="arrow">
-        <div class="action">
-          <span *ngIf="log.action === 'Create'">Create</span>
-          <span *ngIf="log.action === 'Update'">
-            Update {{ log.fieldName }}
+<mat-card *ngIf="logs.length; else noLogs">
+  <mat-card-header>
+    <mat-card-title>Log Details</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <table mat-table [dataSource]="logsDataSource" class="state-table">
+      <!-- Action Column -->
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef> Action </th>
+        <td mat-cell *matCellDef="let log">
+          <div class="box">{{ log.action }}</div>
+        </td>
+      </ng-container>
+
+      <!-- Details Column -->
+      <ng-container matColumnDef="details">
+        <th mat-header-cell *matHeaderCellDef> Details </th>
+        <td mat-cell *matCellDef="let log">
+          <ng-container *ngIf="log.action === 'Update'">
+            <ng-container *ngIf="log.fieldName === 'Description'">
+              Description updated
+            </ng-container>
             <ng-container *ngIf="log.fieldName !== 'Description'">
               "{{ log.value }}"
             </ng-container>
-          </span>
-          <span *ngIf="log.action === 'Assign'">Assigned to {{ log.value }}</span>
-          <span *ngIf="log.action === 'Closed'">Closed</span>
-        </div>
-        <div class="line"></div>
-      </div>
-      <div class="info">
-        <div *ngIf="log.action === 'Create'" class="box">New</div>
-        <div *ngIf="log.action === 'Update'" class="box">Update</div>
-        <div *ngIf="log.action === 'Assign'" class="box">Assign</div>
-        <div *ngIf="log.action === 'Closed'" class="box">Completed</div>
-        <div class="user">{{ log.modifierUser }}</div>
-        <div class="date">{{ log.date | date: 'short' }}</div>
-      </div>
-    </div>
-  </div>
-  <ng-template #noLogs>
-    <p class="text-muted">No logs available.</p>
-  </ng-template>
-  
+          </ng-container>
+      
+          <ng-container *ngIf="log.action === 'Assign'">
+            Assign to {{ log.value }}
+          </ng-container>
+      
+          <ng-container *ngIf="log.action === 'Create'">
+            New
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <!-- User Column -->
+      <ng-container matColumnDef="user">
+        <th mat-header-cell *matHeaderCellDef> Modifier </th>
+        <td mat-cell *matCellDef="let log" class="user">{{ log.modifierUser }}</td>
+      </ng-container>
+
+      <!-- Date Column -->
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef> Date </th>
+        <td mat-cell *matCellDef="let log" class="date">{{ log.date | date: 'short' }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <!-- Add Paginator Below the Table -->
+    <mat-paginator
+      *ngIf="totalNotes >= 5"
+      [length]="totalNotes"
+      [pageSize]="pageSize"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </mat-card-content>
+</mat-card>
+
+<ng-template #noLogs>
+  <p class="text-muted">No logs available.</p>
+</ng-template>
